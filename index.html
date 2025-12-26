@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Formation — Débutant, Moyen, Avancé</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #1453ff;
+      --accent: #10b981;
+      --danger: #dc2626;
+      --bg: #f7fafc;
+      --text: #111827;
+    }
+    * { box-sizing: border-box }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--text); background: var(--bg); }
+    header, footer { background: var(--primary); color: #fff; padding: 12px; }
+    nav a { color:#fff; text-decoration:none; margin-right: 12px; font-weight:600; }
+    .container { max-width: 980px; margin: 0 auto; padding: 16px; }
+    .hidden { display:none !important; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:16px; margin: 12px 0; }
+    .grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .btn { display:inline-block; background: var(--primary); color:#fff; border:none; border-radius:8px; padding:10px 14px; cursor:pointer; }
+    .btn-outline { background:#fff; color: var(--primary); border:1px solid var(--primary); }
+    .btn-success { background: var(--accent); }
+    .btn-danger { background: var(--danger); }
+    input, select, textarea { width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin:6px 0 14px; background:#fff; }
+    label { font-weight: 600; margin-top:8px; display:block; }
+    .photos { display:flex; gap:10px; flex-wrap:wrap; }
+    .photos img { width: 180px; height: 110px; object-fit: cover; border-radius:8px; }
+    .muted { color:#6b7280; font-size: 14px; }
+    .notice { padding:10px; background:#ecfeff; border:1px solid #67e8f9; color:#0e7490; border-radius:8px; }
+    .error { padding:10px; background:#fee2e2; border:1px solid #fecaca; color:#7f1d1d; border-radius:8px; }
+    ol.chapter-list { padding-left:18px; }
+    .lock { color:#6b7280; font-style:italic; }
+    .tab { display:flex; gap:8px; margin: 12px 0; }
+    .tab button { background:#fff; color:#374151; border:1px solid #d1d5db; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .tab button.active { background:#1f2937; color:#fff; }
+    .download { display:inline-block; margin-top:8px; }
+    footer small { display:block; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="#" onclick="go('home')">Accueil</a>
+      <a href="#" onclick="go('privacy')">Confidentialité</a>
+      <a href="#" onclick="go('register')">S’inscrire</a>
+      <a href="#" onclick="go('login')">Se connecter</a>
+      <span id="nav-auth" class="hidden">
+        <a href="#" onclick="go('dashboard')">Tableau de bord</a>
+        <a href="#" onclick="logout()">Se déconnecter</a>
+      </span>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Accueil -->
+    <section id="home" class="page">
+      <h1>Centre de formation</h1>
+      <p>Découvrez nos parcours: Débutant, Moyen et Avancé. Chaque niveau propose des chapitres avec cours, documents, vidéos, exercices et évaluations.</p>
+      <div class="photos">
+        <img src="https://picsum.photos/300/200?1" alt="Promo 1">
+        <img src="https://picsum.photos/300/200?2" alt="Promo 2">
+        <img src="https://picsum.photos/300/200?3" alt="Promo 3">
+      </div>
+
+      <h2>Niveaux de formation</h2>
+      <div id="home-classes" class="grid"></div>
+
+      <div class="card">
+        <h3>Contact</h3>
+        <p><strong>Téléphone:</strong> +228 92 23 93 33</p>
+        <p><strong>Email:</strong> tenteessaie@gmail.com</p>
+      </div>
+    </section>
+
+    <!-- Politique de confidentialité -->
+    <section id="privacy" class="page hidden">
+      <h1>Politique de confidentialité</h1>
+      <div class="card">
+        <p>Nous ne collectons que les informations nécessaires à votre inscription et à votre progression pédagogique. Vos données restent sur votre appareil (stockage local) et ne sont partagées avec aucun tiers.</p>
+        <p>Vous pouvez à tout moment supprimer vos données via le bouton “Effacer mes données” dans votre tableau de bord.</p>
+      </div>
+    </section>
+
+    <!-- Inscription: Étapes -->
+    <section id="register" class="page hidden">
+      <h1>Inscription</h1>
+      <div id="reg-error" class="error hidden"></div>
+
+      <!-- Étape 1 -->
+      <div id="reg-step1" class="card">
+        <h2>Étape 1 — Informations personnelles</h2>
+        <label>Nom</label><input id="r_last" type="text" />
+        <label>Prénom(s)</label><input id="r_first" type="text" />
+        <label>Numéro</label><input id="r_phone" type="text" />
+        <label>Email</label><input id="r_email" type="email" />
+        <label>Ville de résidence</label><input id="r_city" type="text" />
+        <label>Pays</label><input id="r_country" type="text" />
+        <button class="btn" onclick="regNext(1)">Suivant</button>
+      </div>
+
+      <!-- Étape 2 -->
+      <div id="reg-step2" class="card hidden">
+        <h2>Étape 2 — Études et choix</h2>
+        <label>Niveau d’étude</label>
+        <select id="r_study">
+          <option value="">— Sélectionner —</option>
+          <option>CEPD</option>
+          <option>BEPC</option>
+          <option value="BAC1">BAC 1</option>
+          <option value="BAC2">BAC 2</option>
+          <option value="LICENCE">Licence</option>
+          <option value="AUTRES">Autres (à préciser)</option>
+        </select>
+        <label>Si "Autres", préciser</label><input id="r_study_other" type="text" />
+        <label>Profession actuelle</label><input id="r_job" type="text" />
+        <label>Niveau en informatique</label>
+        <select id="r_it">
+          <option value="">— Sélectionner —</option>
+          <option value="DEB">Débutant</option>
+          <option value="MOY">Moyen</option>
+          <option value="AVA">Avancé</option>
+        </select>
+        <label>Choix du niveau de formation</label>
+        <select id="r_training">
+          <option value="">— Sélectionner —</option>
+          <option value="DEB">Débutant</option>
+          <option value="MOY">Moyen</option>
+          <option value="AVA">Avancé</option>
+        </select>
+        <button class="btn" onclick="regNext(2)">Suivant</button>
+      </div>
+
+      <!-- Étape 3 -->
+      <div id="reg-step3" class="card hidden">
+        <h2>Étape 3 — Paiement</h2>
+        <p class="notice">Paiement automatisé (simulation). Aucun numéro Mixx By Yas ou Flooz n'est affiché.</p>
+        <p><strong>Montant:</strong> <span id="r_price">—</span> FCFA</p>
+        <label><input id="r_confirm" type="checkbox" /> Confirmer le paiement</label>
+        <button class="btn btn-success" onclick="regPay()">Confirmer et recevoir le code</button>
+      </div>
+    </section>
+
+    <!-- Connexion -->
+    <section id="login" class="page hidden">
+      <h1>Se connecter</h1>
+      <div id="login-error" class="error hidden"></div>
+      <div class="card">
+        <label>Email</label><input id="l_email" type="email" />
+        <label>Code reçu par email</label><input id="l_code" type="text" />
+        <button class="btn" onclick="login()">Se connecter</button>
+      </div>
+    </section>
+
+    <!-- Tableau de bord -->
+    <section id="dashboard" class="page hidden">
+      <h1>Tableau de bord</h1>
+      <div id="dash-info" class="card"></div>
+      <div class="card">
+        <button class="btn-outline" onclick="eraseData()">Effacer mes données</button>
+      </div>
+      <h2>Mes classes</h2>
+      <div id="my-classes" class="grid"></div>
+    </section>
+
+    <!-- Détail de classe -->
+    <section id="class" class="page hidden">
+      <div id="class-head" class="card"></div>
+      <h3>Chapitres</h3>
+      <ol id="class-chapters" class="chapter-list"></ol>
+      <button class="btn-outline" onclick="go('dashboard')">Retour</button>
+    </section>
+
+    <!-- Détail de chapitre -->
+    <section id="chapter" class="page hidden">
+      <div id="chap-head" class="card"></div>
+
+      <div id="chap-content" class="card"></div>
+
+      <div class="tab">
+        <button id="tab-ex" class="active" onclick="setTab('exercise')">Exercices</button>
+        <button id="tab-ev" onclick="setTab('evaluation')">Évaluations</button>
+      </div>
+
+      <div id="chap-exercises" class="card"></div>
+      <div id="chap-evaluations" class="card hidden"></div>
+
+      <button class="btn-outline" onclick="openClass(current.classId)">Retour à la classe</button>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>Contact:</strong> +228 92 23 93 33 · tenteessaie@gmail.com
+      <small>&copy; Formation</small>
+    </div>
+  </footer>
+
+  <script>
+    // --- Données de démonstration (classes, chapitres, contenus) ---
+    const demoData = {
+      classes: [
+        { id: 1, title: "Parcours Débutant", level: "DEB", description: "Premiers pas en informatique: fondamentaux, fichiers, bureautique, internet." },
+        { id: 2, title: "Parcours Moyen", level: "MOY", description: "Approfondissement: Excel avancé, bases de programmation, réseaux." },
+        { id: 3, title: "Parcours Avancé", level: "AVA", description: "Projets complets: développement, base de données, sécurité, déploiement." }
+      ],
+      chapters: [
+        // Débutant
+        { id: 11, classId:1, order:1, title:"Découverte du système", text:"Comprendre dossiers, fichiers, extensions, et bonnes pratiques.",
+          document:"data:application/pdf;base64,", image:"https://picsum.photos/600/300?10", video:"https://example.com/video1",
+          link:"https://example.com/ref1",
+          exercises:[{id:101, title:"Exercice 1", instructions:"Lister 10 extensions de fichiers et leur usage."}],
+          evaluations:[{id:201, title:"Quiz système", instructions:"10 questions à choix multiples.", max:20, pass:10}]
+        },
+        { id: 12, classId:1, order:2, title:"Bureautique essentielle", text:"Bases de Word, Excel, PowerPoint: styles, formules simples, présentation.",
+          document:"data:application/pdf;base64,", link:"https://example.com/ref2",
+          exercises:[{id:102, title:"Exercice 2", instructions:"Créer un tableau Excel avec 3 colonnes et 10 lignes."}],
+          evaluations:[{id:202, title:"Mini évaluation bureautique", instructions:"Téléversez votre fichier.", max:20, pass:10}]
+        },
+        // Moyen
+        { id: 21, classId:2, order:1, title:"Excel avancé", text:"Fonctions: VLOOKUP, INDEX/MATCH, tableaux croisés dynamiques.",
+          exercises:[{id:103, title:"Exercice 1", instructions:"Réaliser un TCD sur des ventes mensuelles."}],
+          evaluations:[{id:203, title:"Éval Excel", instructions:"Envoyer un fichier avec 3 fonctions avancées.", max:20, pass:12}]
+        },
+        { id: 22, classId:2, order:2, title:"Bases de programmation", text:"Variables, conditions, boucles, fonctions et structures de données.",
+          exercises:[{id:104, title:"Exercice 2", instructions:"Écrire un algorithme qui calcule une moyenne."}],
+          evaluations:[{id:204, title:"Quiz programmation", instructions:"10 QCM + 1 exercice libre.", max:20, pass:12}]
+        },
+        // Avancé
+        { id: 31, classId:3, order:1, title:"Développement web", text:"HTML, CSS, JS, frameworks et bonnes pratiques.",
+          exercises:[{id:105, title:"Exercice 1", instructions:"Construire une page responsive."}],
+          evaluations:[{id:205, title:"Éval web", instructions:"Soumettre une mini-application.", max:20, pass:12}]
+        },
+        { id: 32, classId:3, order:2, title:"Base de données", text:"Conception, SQL, transactions, index et sécurité.",
+          exercises:[{id:106, title:"Exercice 2", instructions:"Créer un schéma relationnel pour une boutique."}],
+          evaluations:[{id:206, title:"Quiz SQL", instructions:"10 QCM + 2 requêtes d’agrégation.", max:20, pass:12}]
+        },
+      ]
+    };
+
+    // --- État courant ---
+    const current = { user:null, classId:null, chapterId:null, tab:'exercise' };
+
+    // --- Utilitaires ---
+    function go(pageId){
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageId).classList.remove('hidden');
+      document.getElementById('nav-auth').classList.toggle('hidden', !current.user);
+      if(pageId === 'home'){ renderHome(); }
+      if(pageId === 'dashboard'){ renderDashboard(); }
+    }
+
+    function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+    function load(key, def=null){
+      try { return JSON.parse(localStorage.getItem(key)) ?? def; }
+      catch(e){ return def; }
+    }
+    function uuid(n=8){ const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let o=''; for(let i=0;i<n;i++) o+=chars[Math.floor(Math.random()*chars.length)]; return o; }
+
+    // --- Accueil ---
+    function renderHome(){
+      const wrap = document.getElementById('home-classes');
+      wrap.innerHTML = '';
+      demoData.classes.forEach(cls => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <h3>${cls.title}</h3>
+          <p class="muted">Niveau: ${labelLevel(cls.level)}</p>
+          <p>${cls.description}</p>
+          <button class="btn" onclick="openClassPublic(${cls.id})">Voir la classe</button>
+        `;
+        wrap.appendChild(div);
+      });
+    }
+
+    function labelLevel(l){
+      return l==='DEB'?'Débutant':(l==='MOY'?'Moyen':'Avancé');
+    }
+
+    function openClassPublic(classId){
+      // Affichage public sans progression
+      const cls = demoData.classes.find(c=>c.id===classId);
+      const chapters = demoData.chapters.filter(ch=>ch.classId===classId).sort((a,b)=>a.order-b.order);
+      const head = document.getElementById('class-head');
+      const list = document.getElementById('class-chapters');
+      head.innerHTML = `
+        <h2>${cls.title} — ${labelLevel(cls.level)}</h2>
+        <p>${cls.description}</p>
+      `;
+      list.innerHTML = '';
+      chapters.forEach(ch=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#" onclick="openChapter(${ch.id})">${ch.order}. ${ch.title}</a>`;
+        list.appendChild(li);
+      });
+      current.classId = classId;
+      go('class');
+    }
+
+    // --- Inscription (multi-étapes) ---
+    function showError(id, msg){
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.toggle('hidden', !msg);
+    }
+
+    function regNext(step){
+      if(step===1){
+        const last = v('r_last'), first=v('r_first'), phone=v('r_phone'), email=v('r_email'), city=v('r_city'), country=v('r_country');
+        if(!last || !first || !phone || !email || !city || !country){
+          return showError('reg-error', 'Veuillez remplir tous les champs de l’étape 1.');
+        }
+        save('reg_step1', {last, first, phone, email, city, country});
+        showError('reg-error', '');
+        document.getElementById('reg-step1').classList.add('hidden');
+        document.getElementById('reg-step2').classList.remove('hidden');
+      } else if(step===2){
+        const study=v('r_study'), other=v('r_study_other'), job=v('r_job'), it=v('r_it'), training=v('r_training');
+        if(!study || !it || !training){
+          return showError('reg-error','Veuillez choisir les niveaux d’étude, d’informatique et de formation.');
+        }
+        save('reg_step2', {study, other, job, it, training});
+        const priceMap={DEB:5000, MOY:8000, AVA:12000};
+        document.getElementById('r_price').textContent = priceMap[training] || '5000';
+        showError('reg-error','');
+        document.getElementById('reg-step2').classList.add('hidden');
+        document.getElementById('reg-step3').classList.remove('hidden');
+      }
+    }
+    function v(id){ return document.getElementById(id).value.trim(); }
+
+    function regPay(){
+      const confirmed = document.getElementById('r_confirm').checked;
+      if(!confirmed){ return showError('reg-error','Veuillez cocher “Confirmer le paiement”.'); }
+      const s1 = load('reg_step1'), s2 = load('reg_step2');
+      if(!s1 || !s2){ return showError('reg-error','Inscription incomplète.'); }
+      const accessCode = uuid(8);
+      const student = { ...s1, ...s2, accessCode, paymentConfirmed:true, progress:{} };
+      save('student', student);
+      alert("Paiement confirmé. Votre code d’accès: " + accessCode + "\n(Conservez-le pour vous connecter)");
+      go('login');
+    }
+
+    // --- Connexion / Session ---
+    function login(){
+      const email = v('l_email'), code = v('l_code');
+      const student = load('student');
+      if(!student || !student.paymentConfirmed){
+        return showError('login-error','Aucun compte trouvé. Veuillez vous inscrire.');
+      }
+      if(student.email !== email || student.accessCode !== code){
+        return showError('login-error','Email ou code invalide.');
+      }
+      current.user = { email };
+      showError('login-error','');
+      document.getElementById('nav-auth').classList.remove('hidden');
+      go('dashboard');
+    }
+
+    function logout(){
+      current.user = null;
+      document.getElementById('nav-auth').classList.add('hidden');
+      go('home');
+    }
+
+    function eraseData(){
+      localStorage.removeItem('student');
+      localStorage.removeItem('reg_step1');
+      localStorage.removeItem('reg_step2');
+      alert('Vos données locales ont été supprimées.');
+      logout();
+    }
+
+    // --- Tableau de bord ---
+    function renderDashboard(){
+      const student = load('student');
+      if(!student){ return go('home'); }
+      const box = document.getElementById('dash-info');
+      box.innerHTML = `
+        <p><strong>Nom:</strong> ${student.last} ${student.first}</p>
+        <p><strong>Email:</strong> ${student.email}</p>
+        <p><strong>Niveau d’informatique:</strong> ${labelLevel(student.it)}</p>
+        <p><strong>Niveau de formation choisi:</strong> ${labelLevel(student.training)}</p>
+        <p class="muted">Code d’accès: ${student.accessCode}</p>
+      `;
+      // Classes accessibles selon niveau choisi
+      const wrap = document.getElementById('my-classes');
+      wrap.innerHTML = '';
+      demoData.classes
+        .filter(c => c.level === student.training)
+        .forEach(cls => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `
+            <h3>${cls.title}</h3>
+            <p>${cls.description}</p>
+            <button class="btn" onclick="openClass(${cls.id})">Accéder</button>
+          `;
+          wrap.appendChild(div);
+        });
+    }
+
+    // --- Classe (avec verrouillage progression) ---
+    function openClass(classId){
+      current.classId = classId;
+      const student = load('student');
+      const cls = demoData.classes.find(c=>c.id===classId);
+      const chapters = demoData.chapters.filter(ch=>ch.classId===classId).sort((a,b)=>a.order-b.order);
+
+      const unlockedIndex = calcUnlockedIndex(student, chapters);
+
+      const head = document.getElementById('class-head');
+      const list = document.getElementById('class-chapters');
+      head.innerHTML = `<h2>${cls.title} — ${labelLevel(cls.level)}</h2><p>${cls.description}</p>`;
+      list.innerHTML = '';
+      chapters.forEach((ch, i)=>{
+        const li = document.createElement('li');
+        if(i <= unlockedIndex){
+          li.innerHTML = `<a href="#" onclick="openChapter(${ch.id})">${ch.order}. ${ch.title}</a>`;
+        } else {
+          li.innerHTML = `${ch.order}. ${ch.title} <span class="lock">(verrouillé)</span>`;
+        }
+        list.appendChild(li);
+      });
+      go('class');
+    }
+
+    function calcUnlockedIndex(student, chapters){
+      // Si évaluation validée (score >= pass), on déverrouille le suivant
+      const progress = student.progress || {};
+      let unlocked = 0;
+      for(let i=0;i<chapters.length;i++){
+        const ch = chapters[i];
+        const chProg = progress[ch.id] || {};
+        if(!ch.evaluations || ch.evaluations.length===0){
+          unlocked = i; continue;
+        }
+        if(chProg.bestScore && chProg.passMark && chProg.bestScore >= chProg.passMark){
+          unlocked = i+1;
+        } else {
+          break;
+        }
+      }
+      return unlocked;
+    }
+
+    // --- Chapitre ---
+    function openChapter(chapterId){
+      const student = load('student');
+      const chapters = demoData.chapters.filter(ch=>ch.classId===current.classId).sort((a,b)=>a.order-b.order);
+      const index = chapters.findIndex(c=>c.id===chapterId);
+      const unlockedIndex = calcUnlockedIndex(student, chapters);
+      if(index > unlockedIndex){
+        alert("Vous devez valider le chapitre précédent avant d’accéder à celui-ci.");
+        return;
+      }
+      current.chapterId = chapterId;
+      const ch = demoData.chapters.find(x=>x.id===chapterId);
+
+      // Head
+      document.getElementById('chap-head').innerHTML = `<h2>${ch.title}</h2>`;
+
+      // Content: texte, document, image, vidéo, lien
+      let html = '';
+      if(ch.text){ html += `<div><p>${ch.text}</p></div>`; }
+      if(ch.document){ html += `<div><a class="btn download" href="${ch.document}" download>Télécharger le document</a></div>`; }
+      if(ch.image){ html += `<div><img src="${ch.image}" alt="Image" style="max-width:100%; border-radius:8px;"></div>`; }
+      if(ch.video){ html += `<div><a class="btn btn-outline" href="${ch.video}" target="_blank">Voir la vidéo</a></div>`; }
+      if(ch.link){ html += `<div><a class="btn btn-outline" href="${ch.link}" target="_blank">Lien externe</a></div>`; }
+      document.getElementById('chap-content').innerHTML = html || '<p class="muted">Aucun contenu.</p>';
+
+      // Exercises
+      const exWrap = document.getElementById('chap-exercises');
+      exWrap.innerHTML = '';
+      (ch.exercises||[]).forEach(ex=>{
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <h4>${ex.title}</h4>
+          <p class="muted">${ex.instructions}</p>
+          <textarea id="ex-${ex.id}" placeholder="Votre réponse"></textarea>
+          <button class="btn" onclick="submitExercise(${ch.id}, ${ex.id})">Soumettre l’exercice</button>
+        `;
+        exWrap.appendChild(div);
+      });
+      if((ch.exercises||[]).length===0){ exWrap.innerHTML = '<p class="muted">Aucun exercice.</p>'; }
+
+      // Evaluations
+      const evWrap = document.getElementById('chap-evaluations');
+      evWrap.innerHTML = '';
+      (ch.evaluations||[]).forEach(ev=>{
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <h4>${ev.title}</h4>
+          <p class="muted">${ev.instructions}</p>
+          <p>Note de passage: ${ev.pass}/${ev.max}</p>
+          <textarea id="ev-${ev.id}" placeholder="Votre réponse d’évaluation"></textarea>
+          <button class="btn btn-success" onclick="submitEvaluation(${ch.id}, ${ev.id}, ${ev.pass})">Soumettre l’évaluation</button>
+        `;
+        evWrap.appendChild(div);
+      });
+      if((ch.evaluations||[]).length===0){ evWrap.innerHTML = '<p class="muted">Aucune évaluation.</p>'; }
+
+      setTab('exercise');
+      go('chapter');
+    }
+
+    function setTab(name){
+      current.tab = name;
+      document.getElementById('chap-exercises').classList.toggle('hidden', name!=='exercise');
+      document.getElementById('chap-evaluations').classList.toggle('hidden', name!=='evaluation');
+      document.getElementById('tab-ex').classList.toggle('active', name==='exercise');
+      document.getElementById('tab-ev').classList.toggle('active', name==='evaluation');
+    }
+
+    function submitExercise(chId, exId){
+      const val = document.getElementById(`ex-${exId}`).value.trim();
+      if(!val){ return alert('Veuillez écrire une réponse.'); }
+      alert('Exercice soumis. Un correcteur pourra vous répondre (simulation locale).');
+      document.getElementById(`ex-${exId}`).value = '';
+    }
+
+    function submitEvaluation(chId, evId, passMark){
+      const val = document.getElementById(`ev-${evId}`).value.trim();
+      if(!val){ return alert('Veuillez écrire une réponse d’évaluation.'); }
+      // Auto-note: si réponse non vide => 12/20, sinon 8/20
+      const score = 12;
+      const student = load('student');
+      const progress = student.progress || {};
+      const chProg = progress[chId] || {};
+      chProg.bestScore = Math.max(chProg.bestScore||0, score);
+      chProg.passMark = passMark;
+      progress[chId] = chProg;
+      student.progress = progress;
+      save('student', student);
+      alert(`Évaluation soumise. Score: ${score}/${passMark<=20?20:passMark}.`);
+      openClass(current.classId);
+    }
+
+    // Init
+    renderHome();
+    // Si déjà connecté (optionnel)
+    const s = load('student');
+    if(s){ document.getElementById('nav-auth').classList.remove('hidden'); }
+  </script>
+</body>
+</html>
