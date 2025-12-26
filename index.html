@@ -14,13 +14,13 @@
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
-    header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+    header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between;}
     /* Menu hamburger (3 lignes horizontales) */
     .menu-btn{display:flex;align-items:center;gap:10px;cursor:pointer;}
     .menu-lines{display:flex;flex-direction:column;gap:4px;}
     .menu-lines div{width:26px;height:3px;background:#fff;border-radius:2px;}
-    .menu-label{font-weight:700;letter-spacing:.2px;}
-    /* Liens Accueil en haut à droite */
+    .menu-label{font-weight:700;}
+    /* Liens en haut à droite (visibles sur Accueil) */
     .top-right{display:flex;flex-direction:column;align-items:flex-end;}
     .top-right a{color:#fff;text-decoration:none;font-weight:700;}
     .top-right a + a{margin-top:4px;}
@@ -28,9 +28,9 @@
     nav#menu{display:none;background:var(--primary);color:#fff;padding:10px 12px;}
     nav#menu a{display:block;color:#fff;text-decoration:none;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.2);}
     nav#menu a:last-child{border-bottom:none;}
+    /* Conteneur et cartes */
     .container{max-width:1000px;margin:20px auto;padding:0 12px;}
-    h1{color:var(--primary);margin:8px 0 12px;}
-    h2{margin-top:18px;}
+    h1{color:var(--primary);}
     .card{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:16px;margin:12px 0;}
     .muted{color:#6b7280;font-size:14px;}
     .image-landscape img{width:100%;border-radius:12px;display:block;}
@@ -42,25 +42,21 @@
     button.secondary{background:#e5e7eb;color:#111;}
     .row{display:flex;gap:12px;flex-wrap:wrap;}
     .row > *{flex:1 1 240px;}
+    ul{margin:0;padding-left:18px;}
   </style>
 </head>
 <body>
   <header>
-    <!-- Bouton menu hamburger -->
     <div class="menu-btn" onclick="toggleMenu()">
-      <div class="menu-lines">
-        <div></div><div></div><div></div>
-      </div>
+      <div class="menu-lines"><div></div><div></div><div></div></div>
       <span class="menu-label">Menu</span>
     </div>
-    <!-- Liens en haut à droite (visible sur Accueil) -->
     <div id="top-right" class="top-right">
       <a href="#" onclick="go('register-step1')">S’inscrire</a>
       <a href="#" onclick="go('login')">Se connecter</a>
     </div>
   </header>
 
-  <!-- Menu déroulant -->
   <nav id="menu">
     <a href="#" onclick="go('home')">Accueil</a>
     <a href="#" onclick="go('dashboard')">Tableau de bord</a>
@@ -75,31 +71,29 @@
       <h1>Informatique avec JUSWELL</h1>
       <p class="muted">Bienvenue sur notre site de formation. Choisissez votre niveau et progressez à votre rythme.</p>
 
-      <!-- Image paysage (ordinateur + logiciels + réseau) -->
       <div class="image-landscape card">
         <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop" alt="Ordinateur avec logiciels et réseau informatique">
       </div>
 
-      <!-- Niveaux de formation (fond bleu transparent) -->
       <h2>Niveaux de formation</h2>
       <div class="card">
         <h3>Débutant</h3>
-        <p>Premiers pas: utilisation de base, bureautique, internet, sécurité essentielle.</p>
+        <p>Premiers pas: utilisation de base, bureautique, internet.</p>
         <button onclick="openClass('DEB')">Voir la classe</button>
       </div>
       <div class="card">
         <h3>Moyen</h3>
-        <p>Approfondissement: Excel avancé, logique de programmation, réseaux fondamentaux.</p>
+        <p>Approfondissement: Excel avancé, programmation, réseaux.</p>
         <button onclick="openClass('MOY')">Voir la classe</button>
       </div>
       <div class="card">
         <h3>Avancé</h3>
-        <p>Projets complets: développement web, bases de données, déploiement et sécurité.</p>
+        <p>Projets complets: développement web, bases de données, sécurité.</p>
         <button onclick="openClass('AVA')">Voir la classe</button>
       </div>
     </section>
 
-    <!-- Formulaire inscription: Étape 1 -->
+    <!-- Inscription — Étape 1 -->
     <section id="register-step1" class="page hidden">
       <h2>Inscription — Étape 1</h2>
       <div class="card">
@@ -107,13 +101,25 @@
         <label>Prénom</label><input id="r_first" placeholder="Ex: Ama">
         <label>Email</label><input id="r_email" type="email" placeholder="exemple@mail.com">
         <div class="row">
+          <div>
+            <label>Indicatif</label>
+            <input id="r_phone_code" placeholder="Ex: +228">
+          </div>
+          <div>
+            <label>Numéro de téléphone</label>
+            <input id="r_phone" type="tel" placeholder="Ex: 92239333">
+          </div>
+        </div>
+        <label>Ville</label><input id="r_city" placeholder="Ex: Kpalimé">
+        <label>Pays</label><input id="r_country" placeholder="Ex: Togo">
+        <div class="row">
           <button onclick="nextStep(1)">Suivant</button>
           <button class="secondary" onclick="go('home')">Annuler</button>
         </div>
       </div>
     </section>
 
-    <!-- Étape 2 -->
+    <!-- Inscription — Étape 2 -->
     <section id="register-step2" class="page hidden">
       <h2>Inscription — Étape 2</h2>
       <div class="card">
@@ -133,7 +139,7 @@
       </div>
     </section>
 
-    <!-- Étape 3 -->
+    <!-- Inscription — Étape 3 -->
     <section id="register-step3" class="page hidden">
       <h2>Inscription — Étape 3 (Paiement simulé)</h2>
       <div class="card">
@@ -151,7 +157,7 @@
       <h2>Se connecter</h2>
       <div class="card">
         <label>Email</label><input id="l_email" type="email" placeholder="exemple@mail.com">
-        <label>Code reçu</label><input id="l_code" placeholder="Ex: JUS-123456">
+        <label>Code reçu</label><input id="l_code" placeholder="Ex: D-123456, M-123456, A-123456">
         <div class="row">
           <button onclick="login()">Se connecter</button>
           <button class="secondary" onclick="go('home')">Annuler</button>
@@ -160,19 +166,17 @@
       </div>
     </section>
 
-    <!-- Page classe (protégée) -->
+    <!-- Classe protégée -->
     <section id="class-page" class="page hidden">
       <h2 id="class-title">Classe</h2>
-      <div class="card" id="class-content">
-        <!-- Contenu chargé dynamiquement -->
-      </div>
+      <div class="card" id="class-content"></div>
       <div class="row">
         <button class="secondary" onclick="go('home')">Retour</button>
         <button onclick="go('dashboard')">Aller au tableau de bord</button>
       </div>
     </section>
 
-    <!-- Tableau de bord (aperçu des cours) -->
+    <!-- Tableau de bord -->
     <section id="dashboard" class="page hidden">
       <h2>Tableau de bord</h2>
       <div class="card">
@@ -194,7 +198,7 @@
       <h2>Espace administrateur</h2>
       <div class="card">
         <label>Code d’accès (admin)</label>
-        <input type="password" id="admin-code" placeholder="Entrer votre code admin">
+        <input type="password" id="admin-code" placeholder="Entrer le code (gsm)">
         <div class="row">
           <button onclick="checkAdmin()">Entrer</button>
           <button class="secondary" onclick="go('home')">Retour</button>
@@ -230,6 +234,7 @@
 
       <div class="card">
         <h3>Liste des inscrits</h3>
+        <p class="muted">Les inscriptions via le formulaire ajoutent automatiquement l’élève ici.</p>
         <div class="row">
           <input type="text" id="student-name" placeholder="Nom complet">
           <select id="student-class">
@@ -254,8 +259,8 @@
     function load(key, def=[]){ try{ const v=JSON.parse(localStorage.getItem(key)); return v ?? def; }catch(e){ return def; } }
     function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
-    // État actuel
-    let pendingClass = null; // classe demandée avant login
+    // État pour classe demandée avant login
+    let pendingClass = null;
 
     // Navigation
     function toggleMenu(){
@@ -270,6 +275,7 @@
       // Fermer menu après navigation
       document.getElementById('menu').style.display='none';
       if(id==='dashboard'){ renderDashboard(); }
+      if(id==='admin-panel'){ renderAdmin(); }
     }
 
     // Inscription étapes
@@ -278,8 +284,15 @@
         const last=document.getElementById('r_last').value.trim();
         const first=document.getElementById('r_first').value.trim();
         const email=document.getElementById('r_email').value.trim();
-        if(!last || !first || !email){ alert('Veuillez remplir Nom, Prénom et Email.'); return; }
-        save('register_tmp',{last,first,email});
+        const phoneCode=document.getElementById('r_phone_code').value.trim();
+        const phone=document.getElementById('r_phone').value.trim();
+        const city=document.getElementById('r_city').value.trim();
+        const country=document.getElementById('r_country').value.trim();
+        if(!last || !first || !email || !phoneCode || !phone || !city || !country){
+          alert('Veuillez remplir tous les champs de l’étape 1.');
+          return;
+        }
+        save('register_tmp',{last,first,email,phoneCode,phone,city,country});
         go('register-step2');
       }else if(step===2){
         const study=document.getElementById('r_study').value;
@@ -298,16 +311,35 @@
       }
       const data=load('register_tmp',null);
       if(!data){ alert('Inscription incomplète.'); return; }
-      // Générer un code simple
-      const code = 'JUS-' + Math.floor(100000 + Math.random()*900000);
-      const student = { ...data, code };
-      // Sauver l’étudiant (liste + session)
+      // Préfixe du code selon la classe
+      const prefixMap={ DEB:'D', MOY:'M', AVA:'A' };
+      const prefix = prefixMap[data.training] || 'D';
+      const code = prefix + '-' + Math.floor(100000 + Math.random()*900000);
+      const fullName = data.first + ' ' + data.last;
+
+      // Ajout automatique dans la liste des inscrits
       const list = load('students');
-      list.push({ name: data.first + ' ' + data.last, email: data.email, cls: data.training, code: code });
+      list.push({
+        name: fullName,
+        email: data.email,
+        cls: data.training,
+        code: code,
+        phoneCode: data.phoneCode,
+        phone: data.phone,
+        city: data.city,
+        country: data.country
+      });
       save('students', list);
-      save('current_user', { email: data.email, code: code, cls: data.training, name: data.first + ' ' + data.last });
+
+      // Session utilisateur
+      save('current_user', {
+        email: data.email,
+        code: code,
+        cls: data.training,
+        name: fullName
+      });
+
       alert('Inscription terminée. Votre code: ' + code);
-      // Nettoyer temporaire et aller à la connexion
       localStorage.removeItem('register_tmp');
       go('login');
     }
@@ -326,15 +358,14 @@
       save('current_user', user);
       alert('Connexion réussie.');
       if(pendingClass){
-        // Redirige vers la classe demandée
-        showClass(pendingClass);
+        openClass(pendingClass);
         pendingClass=null;
       }else{
         go('dashboard');
       }
     }
 
-    // Protection des classes
+    // Protection des classes (accès strict à la classe inscrite)
     function openClass(cls){
       const user = load('current_user', null);
       if(!user){
@@ -343,26 +374,28 @@
         go('login');
         return;
       }
-      // Laisser l’accès si l’utilisateur est connecté (et optionnellement vérifier la classe)
+      if(user.cls !== cls){
+        alert("Accès refusé : vous n'êtes pas inscrit pour cette classe.");
+        return;
+      }
       showClass(cls);
     }
 
-    // Affichage d’une classe
+    // Affichage classe
     function showClass(cls){
       const titleMap = { DEB:'Classe Débutant', MOY:'Classe Moyen', AVA:'Classe Avancé' };
       document.getElementById('class-title').textContent = titleMap[cls] || 'Classe';
-      // Charger cours de cette classe
       const courses = load('courses').filter(c=>c.cls===cls);
       const content = document.getElementById('class-content');
       if(courses.length===0){
         content.innerHTML = '<p class="muted">Aucun cours publié pour cette classe pour le moment.</p>';
       }else{
-        content.innerHTML = '<ul style="padding-left:18px;">' + courses.map(c=>`<li>${c.title}</li>`).join('') + '</ul>';
+        content.innerHTML = '<ul>' + courses.map(c=>`<li>${c.title}</li>`).join('') + '</ul>';
       }
       go('class-page');
     }
 
-    // Déconnexion (simulation)
+    // Déconnexion
     function logout(){
       localStorage.removeItem('current_user');
       alert('Déconnecté.');
@@ -381,7 +414,7 @@
       }
     }
 
-    // Admin: gestion cours et inscrits
+    // Admin: ajouter cours
     function addCourse(){
       const title=document.getElementById('course-title').value.trim();
       const cls=document.getElementById('course-class').value;
@@ -393,19 +426,21 @@
       renderAdmin();
       alert('Cours ajouté.');
     }
+
+    // Admin: ajouter inscrit (simulation)
     function addStudent(){
       const name=document.getElementById('student-name').value.trim();
       const cls=document.getElementById('student-class').value;
       if(!name){ alert('Veuillez entrer un nom.'); return; }
       const students=load('students');
-      // Inscrit fictif sans email/code pour test admin
       students.push({ name, email:'', cls, code:'' });
       save('students', students);
       document.getElementById('student-name').value='';
       renderAdmin();
     }
+
+    // Admin: affichage cours et inscrits
     function renderAdmin(){
-      // Cours groupés
       const courses=load('courses');
       const byClass={ DEB:[], MOY:[], AVA:[] };
       courses.forEach(c=>byClass[c.cls].push(c.title));
@@ -414,7 +449,6 @@
         <div class="card"><strong>Moyen:</strong> ${byClass.MOY.join(', ') || '—'}</div>
         <div class="card"><strong>Avancé:</strong> ${byClass.AVA.join(', ') || '—'}</div>
       `;
-      // Inscrits + filtre
       const students=load('students');
       const counts={DEB:0,MOY:0,AVA:0};
       students.forEach(s=>{ if(counts[s.cls]!=null) counts[s.cls]++; });
@@ -426,7 +460,7 @@
           <button onclick="filterUsers('MOY')">Moyen (${counts.MOY})</button>
           <button onclick="filterUsers('AVA')">Avancé (${counts.AVA})</button>
         </div>
-        <ul id="users-list" style="padding-left:18px;"></ul>
+        <ul id="users-list"></ul>
       `;
       renderUsersList('ALL');
     }
@@ -439,16 +473,16 @@
         ul.innerHTML='<li class="muted">Aucun inscrit pour ce filtre.</li>';
       }else{
         filtered.forEach(s=>{
-          const li=document.createElement('li');
           const clsLabel = s.cls==='DEB'?'Débutant':(s.cls==='MOY'?'Moyen':'Avancé');
-          li.textContent = `${s.name || '(Sans nom)'} — ${clsLabel}`;
+          const li=document.createElement('li');
+          li.innerHTML = `<strong>${s.name || '(Sans nom)'}</strong> — ${clsLabel}`;
           ul.appendChild(li);
         });
       }
     }
     function filterUsers(cls){ renderUsersList(cls); }
 
-    // Dashboard: aperçu des cours
+    // Tableau de bord: aperçu des cours
     function renderDashboard(){
       const courses=load('courses');
       const box=document.getElementById('dashboard-courses');
@@ -464,7 +498,7 @@
       `;
     }
 
-    // Init
+    // Initialisation
     go('home');
   </script>
 </body>
