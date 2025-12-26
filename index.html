@@ -545,5 +545,84 @@
     const s = load('student');
     if(s){ document.getElementById('nav-auth').classList.remove('hidden'); }
   </script>
+  <!-- Bouton pour accéder à l'espace admin -->
+<section id="admin-login">
+  <h2>Espace administrateur</h2>
+  <label>Code d'accès :</label>
+  <input type="password" id="admin-code" />
+  <button onclick="checkAdmin()">Entrer</button>
+</section>
+
+<!-- Interface admin cachée -->
+<section id="admin-panel" class="hidden">
+  <h2>Tableau de bord Admin</h2>
+  <p>Bienvenue administrateur !</p>
+
+  <h3>Liste des inscrits</h3>
+  <div id="admin-users"></div>
+
+  <h3>Ajouter un cours</h3>
+  <label>Titre du cours :</label>
+  <input type="text" id="course-title" />
+  <label>Classe :</label>
+  <select id="course-class">
+    <option value="DEB">Débutant</option>
+    <option value="MOY">Moyen</option>
+    <option value="AVA">Avancé</option>
+  </select>
+  <button onclick="addCourse()">Ajouter</button>
+
+  <h3>Cours existants</h3>
+  <div id="admin-courses"></div>
+</section>
+
+<script>
+  function checkAdmin(){
+    const code = document.getElementById('admin-code').value;
+    if(code === "gsm"){
+      document.getElementById('admin-panel').classList.remove('hidden');
+      document.getElementById('admin-login').classList.add('hidden');
+      renderAdmin();
+    } else {
+      alert("Code incorrect !");
+    }
+  }
+
+  function renderAdmin(){
+    // Exemple de données locales
+    const users = JSON.parse(localStorage.getItem('students') || "[]");
+    const courses = JSON.parse(localStorage.getItem('courses') || "[]");
+
+    // Afficher inscrits
+    let htmlUsers = "<ul>";
+    users.forEach(u => {
+      htmlUsers += `<li>${u.nom} - ${u.classe}</li>`;
+    });
+    htmlUsers += "</ul>";
+    document.getElementById('admin-users').innerHTML = htmlUsers;
+
+    // Afficher cours
+    let htmlCourses = "<ul>";
+    courses.forEach(c => {
+      htmlCourses += `<li>${c.titre} (${c.classe})</li>`;
+    });
+    htmlCourses += "</ul>";
+    document.getElementById('admin-courses').innerHTML = htmlCourses;
+  }
+
+  function addCourse(){
+    const titre = document.getElementById('course-title').value;
+    const classe = document.getElementById('course-class').value;
+    const courses = JSON.parse(localStorage.getItem('courses') || "[]");
+    courses.push({titre, classe});
+    localStorage.setItem('courses', JSON.stringify(courses));
+    renderAdmin();
+    alert("Cours ajouté !");
+  }
+</script>
+
+<style>
+  .hidden { display: none; }
+</style>
 </body>
 </html>
