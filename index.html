@@ -40,6 +40,7 @@
     .row > *{flex:1 1 240px;}
     .small-input{flex:0 0 90px;text-align:center;}
     ul{margin:0;padding-left:18px;}
+    .details{background:#eef2ff;padding:10px;border-radius:8px;margin-top:6px;}
   </style>
 </head>
 <body>
@@ -189,8 +190,8 @@
     <section id="admin-login" class="page hidden">
       <h2>Espace administrateur</h2>
       <div class="card">
-        <label>Code d’accès (admin)</label>
-        <input type="password" id="admin-code" placeholder="Entrer le code (gsm)">
+        <label>Entrer votre code</label>
+        <input type="password" id="admin-code" placeholder="Entrer votre code">
         <div class="row">
           <button onclick="checkAdmin()">Entrer</button>
           <button class="secondary" onclick="go('home')">Retour</button>
@@ -227,15 +228,6 @@
       <div class="card">
         <h3>Liste des inscrits</h3>
         <p class="muted">Les inscriptions via le formulaire ajoutent automatiquement l’élève ici.</p>
-        <div class="row">
-          <input type="text" id="student-name" placeholder="Nom complet">
-          <select id="student-class">
-            <option value="DEB">Débutant</option>
-            <option value="MOY">Moyen</option>
-            <option value="AVA">Avancé</option>
-          </select>
-          <button onclick="addStudent()">Ajouter un inscrit (simulation)</button>
-        </div>
         <div id="admin-users" style="margin-top:10px;"></div>
       </div>
     </section>
@@ -251,7 +243,6 @@
     function load(key, def=[]){ try{ const v=JSON.parse(localStorage.getItem(key)); return v ?? def; }catch(e){ return def; } }
     function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 
-    // État pour classe demandée avant login
     let pendingClass = null;
 
     // Navigation
@@ -301,13 +292,11 @@
       }
       const data=load('register_tmp',null);
       if(!data){ alert('Inscription incomplète.'); return; }
-      // Préfixe du code selon la classe
       const prefixMap={ DEB:'D', MOY:'M', AVA:'A' };
       const prefix = prefixMap[data.training] || 'D';
       const code = prefix + '-' + Math.floor(100000 + Math.random()*900000);
       const fullName = data.first + ' ' + data.last;
 
-      // Ajout automatique dans la liste des inscrits
       const list = load('students');
       list.push({
         name: fullName,
@@ -317,11 +306,13 @@
         phoneCode: data.phoneCode,
         phone: data.phone,
         city: data.city,
-        country: data.country
+        country: data.country,
+        study: data.study || '',
+        job: data.job || '',
+        it: data.it || ''
       });
       save('students', list);
 
-      // Session utilisateur
       save('current_user', {
         email: data.email,
         code: code,
@@ -355,7 +346,7 @@
       }
     }
 
-    // Protection des classes (accès strict à la classe inscrite)
+    // Protection des classes
     function openClass(cls){
       const user = load('current_user', null);
       if(!user){
@@ -417,18 +408,6 @@
       alert('Cours ajouté.');
     }
 
-    // Admin: ajouter inscrit (simulation)
-    function addStudent(){
-      const name=document.getElementById('student-name').value.trim();
-      const cls=document.getElementById('student-class').value;
-      if(!name){ alert('Veuillez entrer un nom.'); return; }
-      const students=load('students');
-      students.push({ name, email:'', cls, code:'' });
-      save('students', students);
-      document.getElementById('student-name').value='';
-      renderAdmin();
-    }
-
     // Admin: affichage cours et inscrits
     function renderAdmin(){
       const courses=load('courses');
@@ -439,9 +418,11 @@
         <div class="card"><strong>Moyen:</strong> ${byClass.MOY.join(', ') || '—'}</div>
         <div class="card"><strong>Avancé:</strong> ${byClass.AVA.join(', ') || '—'}</div>
       `;
+
       const students=load('students');
       const counts={DEB:0,MOY:0,AVA:0};
       students.forEach(s=>{ if(counts[s.cls]!=null) counts[s.cls]++; });
+
       const wrap=document.getElementById('admin-users');
       wrap.innerHTML = `
         <div class="row" style="margin-bottom:8px;">
@@ -454,6 +435,7 @@
       `;
       renderUsersList('ALL');
     }
+
     function renderUsersList(filter){
       const students=load('students');
       const ul=document.getElementById('users-list');
@@ -462,17 +444,36 @@
       if(filtered.length===0){
         ul.innerHTML='<li class="muted">Aucun inscrit pour ce filtre.</li>';
       }else{
-        filtered.forEach(s=>{
+        filtered.forEach((s, idx)=>{
           const clsLabel = s.cls==='DEB'?'Débutant':(s.cls==='MOY'?'Moyen':'Avancé');
           const li=document.createElement('li');
-          li.innerHTML = `<strong>${s.name || '(Sans nom)'}</strong> — ${clsLabel}`;
+          const id = `details-${filter}-${idx}`;
+          li.innerHTML = `
+            <strong>${s.name || '(Sans nom)'}</strong> — ${clsLabel}
+            <button class="secondary" onclick="toggleDetails('${id}')">Détails</button>
+            <div id="${id}" class="details hidden">
+              <div><strong>Email:</strong> ${s.email || '—'}</div>
+              <div><strong>Téléphone:</strong> ${s.phoneCode || '—'} ${s.phone || ''}</div>
+              <div><strong>Ville:</strong> ${s.city || '—'}</div>
+              <div><strong>Pays:</strong> ${s.country || '—'}</div>
+              <div><strong>Niveau d’étude:</strong> ${s.study || '—'}</div>
+              <div><strong>Profession:</strong> ${s.job || '—'}</div>
+              <div><strong>Niveau informatique:</strong> ${s.it || '—'}</div>
+              <div><strong>Classe:</strong> ${clsLabel}</div>
+              <div><strong>Code:</strong> ${s.code || '—'}</div>
+            </div>
+          `;
           ul.appendChild(li);
         });
       }
     }
+    function toggleDetails(id){
+      const el = document.getElementById(id);
+      el.classList.toggle('hidden');
+    }
     function filterUsers(cls){ renderUsersList(cls); }
 
-    // Tableau de bord: aperçu des cours
+    // Tableau de bord
     function renderDashboard(){
       const courses=load('courses');
       const box=document.getElementById('dashboard-courses');
@@ -488,7 +489,7 @@
       `;
     }
 
-    // Initialisation
+    // Init
     go('home');
   </script>
 </body>
