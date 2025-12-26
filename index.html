@@ -15,20 +15,16 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);}
     header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between;}
-    /* Menu hamburger (3 lignes horizontales) */
     .menu-btn{display:flex;align-items:center;gap:10px;cursor:pointer;}
     .menu-lines{display:flex;flex-direction:column;gap:4px;}
     .menu-lines div{width:26px;height:3px;background:#fff;border-radius:2px;}
     .menu-label{font-weight:700;}
-    /* Liens en haut à droite (visibles sur Accueil) */
     .top-right{display:flex;flex-direction:column;align-items:flex-end;}
     .top-right a{color:#fff;text-decoration:none;font-weight:700;}
-    .top-right a + a{margin-top:4px;}
-    /* Menu déroulant */
+    .top-right a+a{margin-top:4px;}
     nav#menu{display:none;background:var(--primary);color:#fff;padding:10px 12px;}
     nav#menu a{display:block;color:#fff;text-decoration:none;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.2);}
     nav#menu a:last-child{border-bottom:none;}
-    /* Conteneur et cartes */
     .container{max-width:1000px;margin:20px auto;padding:0 12px;}
     h1{color:var(--primary);}
     .card{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:16px;margin:12px 0;}
@@ -42,6 +38,7 @@
     button.secondary{background:#e5e7eb;color:#111;}
     .row{display:flex;gap:12px;flex-wrap:wrap;}
     .row > *{flex:1 1 240px;}
+    .small-input{flex:0 0 90px;text-align:center;}
     ul{margin:0;padding-left:18px;}
   </style>
 </head>
@@ -100,15 +97,10 @@
         <label>Nom</label><input id="r_last" placeholder="Ex: Kossi">
         <label>Prénom</label><input id="r_first" placeholder="Ex: Ama">
         <label>Email</label><input id="r_email" type="email" placeholder="exemple@mail.com">
+        <label>Téléphone</label>
         <div class="row">
-          <div>
-            <label>Indicatif</label>
-            <input id="r_phone_code" placeholder="Ex: +228">
-          </div>
-          <div>
-            <label>Numéro de téléphone</label>
-            <input id="r_phone" type="tel" placeholder="Ex: 92239333">
-          </div>
+          <input id="r_phone_code" class="small-input" placeholder="+228">
+          <input id="r_phone" type="tel" placeholder="92239333">
         </div>
         <label>Ville</label><input id="r_city" placeholder="Ex: Kpalimé">
         <label>Pays</label><input id="r_country" placeholder="Ex: Togo">
@@ -198,8 +190,8 @@
       <h2>Espace administrateur</h2>
       <div class="card">
         <label>Code d’accès (admin)</label>
-        <input type="password" id="admin-code" placeholder="Entrer votre code">
-        <div class="row"> 
+        <input type="password" id="admin-code" placeholder="Entrer le code (gsm)">
+        <div class="row">
           <button onclick="checkAdmin()">Entrer</button>
           <button class="secondary" onclick="go('home')">Retour</button>
         </div>
@@ -270,9 +262,7 @@
     function go(id){
       document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
-      // Top-right visible uniquement sur Accueil
       document.getElementById('top-right').style.display=(id==='home')?'flex':'none';
-      // Fermer menu après navigation
       document.getElementById('menu').style.display='none';
       if(id==='dashboard'){ renderDashboard(); }
       if(id==='admin-panel'){ renderAdmin(); }
