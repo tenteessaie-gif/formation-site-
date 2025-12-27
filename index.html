@@ -646,5 +646,66 @@
     }
   });
   </script>
+  <style>
+  /* Mettre pays, indicatif et numéro sur la même ligne */
+  .phone-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  #r_country {
+    flex: 2;
+  }
+  #r_phone_code {
+    width: 80px;
+    text-align: center;
+  }
+  #r_phone {
+    flex: 3;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const countrySelect = document.getElementById("r_country");
+    const phoneCode = document.getElementById("r_phone_code");
+    const phoneNumber = document.getElementById("r_phone");
+
+    // Table des indicatifs et longueurs minimales
+    const phoneRules = {
+      "TG": { code: "+228", minLength: 8 },   // Togo
+      "FR": { code: "+33",  minLength: 10 },  // France
+      "US": { code: "+1",   minLength: 10 },  // États-Unis
+      "GH": { code: "+233", minLength: 9 },   // Ghana
+      "NG": { code: "+234", minLength: 10 }   // Nigeria
+      // 👉 tu peux ajouter d’autres pays ici
+    };
+
+    // Met à jour l’indicatif et la règle selon le pays choisi
+    function updatePhoneRule() {
+      const selected = countrySelect.value;
+      if (phoneRules[selected]) {
+        phoneCode.value = phoneRules[selected].code;
+        phoneNumber.setAttribute("data-minlength", phoneRules[selected].minLength);
+      }
+    }
+
+    // Vérifie la validité du numéro
+    phoneNumber.addEventListener("input", function() {
+      phoneNumber.value = phoneNumber.value.replace(/\D/g, ""); // garde seulement les chiffres
+      const minLength = parseInt(phoneNumber.getAttribute("data-minlength")) || 8;
+      if (phoneNumber.value.length < minLength) {
+        phoneNumber.setCustomValidity("Le numéro doit contenir au moins " + minLength + " chiffres.");
+      } else {
+        phoneNumber.setCustomValidity("");
+      }
+    });
+
+    // Initialisation
+    updatePhoneRule();
+    countrySelect.addEventListener("change", updatePhoneRule);
+  });
+</script>
 </body>
 </html>
