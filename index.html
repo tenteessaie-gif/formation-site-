@@ -626,7 +626,25 @@
     if(!localStorage.getItem('exercises')) save('exercises',[]);
     if(!localStorage.getItem('students')) save('students',[]);
     if(!localStorage.getItem('conversations')) save('conversations',[]);
-    go('home');
+    go('home'); document.addEventListener("DOMContentLoaded", function() {
+    const homeSection = document.getElementById("home");
+    if (homeSection) {
+      // Cherche l'image dans la section Accueil
+      const img = homeSection.querySelector("img");
+      if (img) {
+        // Crée un nouvel élément <p> avec ton texte
+        const message = document.createElement("p");
+        message.textContent = "Bienvenue à la formation en informatique!";
+        message.style.fontSize = "1.2em";
+        message.style.fontWeight = "bold";
+        message.style.color = "#1453ff";
+
+        // Remplace l'image par le texte
+        img.replaceWith(message);
+        console.log("Image remplacée par le message.");
+      }
+    }
+  });
   </script>
 </body>
 </html>
