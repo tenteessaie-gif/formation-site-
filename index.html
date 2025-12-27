@@ -48,6 +48,15 @@
     .msg.admin{align-self:flex-end;background:#1453ff;color:#fff;border-bottom-right-radius:4px}
     .chat-input{display:flex;gap:8px;margin-top:8px}
     .chat-input textarea{flex:1;min-height:46px}
+
+    /* Admin inbox layout */
+    .inbox-layout{display:flex;gap:14px;flex-wrap:wrap}
+    .inbox-sidebar{flex:0 0 280px;background:#fff;border-radius:10px;padding:10px;max-height:400px;overflow:auto}
+    .inbox-list{display:flex;flex-direction:column;gap:6px}
+    .inbox-user{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;cursor:pointer}
+    .inbox-user:hover{background:#f5f7ff}
+    .avatar{width:28px;height:28px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-weight:700;color:#1f3bcc}
+    .inbox-panel{flex:1;background:#fff;border-radius:10px;padding:10px;display:flex;flex-direction:column}
   </style>
 </head>
 <body>
@@ -75,8 +84,10 @@
     <section id="home" class="page">
       <h1>Informatique avec JUSWELL</h1>
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop"
-             alt="Ordinateur avec logiciels Microsoft" style="width:100%;border-radius:12px;">
+        <!-- Utilise le fichier uploadé (place-le à côté de index.html) -->
+        <img src="telechargement__22_.jpeg"
+             alt="Analyste informatique dans un environnement technologique"
+             style="width:100%;border-radius:12px;">
       </div>
       <div class="card"><h3>Débutant</h3><p class="muted">Utilisation de base, bureautique, internet.</p><button onclick="openClass('DEB')">Voir la classe</button></div>
       <div class="card"><h3>Moyen</h3><p class="muted">Excel avancé, programmation, réseaux.</p><button onclick="openClass('MOY')">Voir la classe</button></div>
@@ -280,11 +291,11 @@
             <button onclick="setInboxClass('MOY')">Moyen</button>
             <button onclick="setInboxClass('AVA')">Avancé</button>
           </div>
-          <div class="row" style="align-items:flex-start;">
-            <div style="flex:0 0 280px;background:#fff;border-radius:10px;padding:10px;max-height:400px;overflow:auto;">
-              <div id="inbox-user-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+          <div class="inbox-layout">
+            <div class="inbox-sidebar">
+              <div id="inbox-user-list" class="inbox-list"></div>
             </div>
-            <div style="flex:1;background:#fff;border-radius:10px;padding:10px;display:flex;flex-direction:column;">
+            <div class="inbox-panel">
               <div id="inbox-thread" class="chat-thread"></div>
               <div class="chat-input">
                 <textarea id="inbox-reply" placeholder="Votre réponse..."></textarea>
@@ -491,7 +502,7 @@
       return 'lien';
     }
 
-    // Rendus Admin
+    // Rendus Admin: cours/exercices
     function renderAdminCourses(){
       const courses=load('courses'); const groups={DEB:[],MOY:[],AVA:[]}; courses.forEach(c=>groups[c.cls]?.push(c));
       g('admin-course-list').innerHTML = ['DEB','MOY','AVA'].map(k=>{
@@ -552,7 +563,7 @@
         const initials=(conv.name||'?').charAt(0).toUpperCase();
         const item=document.createElement('div');
         item.className='inbox-user';
-        item.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-weight:700;color:#1f3bcc">${initials}</div>
+        item.innerHTML=`<div class="avatar">${initials}</div>
                         <div><div><strong>${escapeHTML(conv.name)}</strong></div><div class="muted">${conv.cls}</div></div>`;
         item.onclick=()=>{ inboxSelectedEmail=conv.email; openAdminConversation(conv.email); };
         list.appendChild(item);
