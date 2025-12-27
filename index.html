@@ -87,7 +87,7 @@
   </header>
 
   <nav id="menu">
-    <h3>Navigation</h3>
+    <h3>Menu</h3>
     <a href="#" onclick="closeMenu(); go('home')">Accueil</a>
     <a href="#" onclick="closeMenu(); go('dashboard')">Tableau de bord</a>
     <a href="#" onclick="closeMenu(); go('admin-login')">Espace administrateur</a>
@@ -347,7 +347,7 @@
     }
     function closeMenu(){ g('menu').classList.remove('open'); g('menu-overlay').classList.remove('show'); }
 
-    // Navigation
+    // Menu
     function go(id){
       document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
       g(id).classList.remove('hidden');
