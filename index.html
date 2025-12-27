@@ -8,6 +8,7 @@
     :root{--primary:#1453ff;--bg:#f7fafc;--text:#111827;--muted:#6b7280;--card:#eef2ff;}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+
     header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between}
     .menu-btn{display:flex;align-items:center;gap:10px;cursor:pointer}
     .menu-lines{display:flex;flex-direction:column;gap:4px}
@@ -15,11 +16,26 @@
     .top-right{display:flex;flex-direction:column;align-items:flex-end}
     .top-right a{color:#fff;text-decoration:none;font-weight:700}
     .top-right a+a{margin-top:4px}
-    nav#menu{display:none;background:var(--primary);color:#fff;padding:10px}
-    nav#menu a{display:block;color:#fff;text-decoration:none;padding:8px 0}
+
+    /* Menu latéral gauche (slide-in) */
+    nav#menu{
+      position:fixed; top:0; left:0; height:100vh; width:270px;
+      background:var(--primary); color:#fff; padding:20px;
+      transform:translateX(-100%); transition:transform .3s ease; z-index:1000;
+      box-shadow:0 0 20px rgba(0,0,0,.2);
+    }
+    nav#menu.open{transform:translateX(0)}
+    nav#menu h3{margin:0 0 12px 0}
+    nav#menu a{display:block;color:#fff;text-decoration:none;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.2)}
+    nav#menu a:last-child{border-bottom:none}
+    .menu-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.25); backdrop-filter:blur(2px);
+      opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:900;
+    }
+    .menu-overlay.show{opacity:1; pointer-events:auto}
+
     .container{max-width:1100px;margin:20px auto;padding:0 12px}
     h1{color:var(--primary)}
-    h2{margin-top:0}
     .card{background:var(--card);border-radius:12px;padding:16px;margin:12px 0}
     .muted{color:var(--muted)}
     .hidden{display:none!important}
@@ -28,20 +44,19 @@
     button{background:var(--primary);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
     button.secondary{background:#e5e7eb;color:#111}
     .row{display:flex;gap:12px;flex-wrap:wrap}
-    .row > *{flex:1 1 240px}
     .small-input{flex:0 0 90px;text-align:center}
     .tabbar{display:flex;gap:8px;margin-bottom:8px}
     .tabbtn{background:#e5e7eb;color:#111;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
     .tabbtn.active{background:var(--primary);color:#fff}
     .file-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:8px;padding:8px;margin:6px 0}
     .file-item a{color:#1453ff;text-decoration:none;word-break:break-all}
+
     .sidebar{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
     .sidebtn{background:#e5e7eb;color:#111;padding:10px;border-radius:8px;text-align:left;cursor:pointer}
     .sidebtn.active{background:var(--primary);color:#fff}
     .details{background:#fff;padding:10px;border-radius:8px;margin-top:6px}
-    .pill{display:inline-block;background:#f0f4ff;color:#1f3bcc;padding:4px 8px;border-radius:999px;margin-right:6px;font-size:12px}
 
-    /* Messagerie verticale */
+    /* Messagerie (vertical + input en bas) */
     .chat-thread{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow:auto;padding:6px;background:#fff;border-radius:10px}
     .msg{max-width:75%;padding:8px 12px;border-radius:12px}
     .msg.student{align-self:flex-start;background:#eef2ff;color:#111;border-bottom-left-radius:4px}
@@ -72,19 +87,20 @@
   </header>
 
   <nav id="menu">
-    <a href="#" onclick="go('home')">Accueil</a>
-    <a href="#" onclick="go('dashboard')">Tableau de bord</a>
-    <a href="#" onclick="go('admin-login')">Espace administrateur</a>
-    <a href="#" onclick="go('privacy')">Confidentialité</a>
-    <a href="#" onclick="logout()">Se déconnecter</a>
+    <h3>Menu</h3>
+    <a href="#" onclick="closeMenu(); go('home')">Accueil</a>
+    <a href="#" onclick="closeMenu(); go('dashboard')">Tableau de bord</a>
+    <a href="#" onclick="closeMenu(); go('admin-login')">Espace administrateur</a>
+    <a href="#" onclick="closeMenu(); go('privacy')">Confidentialité</a>
+    <a href="#" onclick="closeMenu(); logout()">Se déconnecter</a>
   </nav>
+  <div id="menu-overlay" class="menu-overlay" onclick="closeMenu()"></div>
 
   <main class="container">
-    <!-- Accueil -->
+    <!-- Accueil avec ton image paysage -->
     <section id="home" class="page">
       <h1>Informatique avec JUSWELL</h1>
       <div class="card">
-        <!-- Utilise le fichier uploadé (place-le à côté de index.html) -->
         <img src="telechargement__22_.jpeg"
              alt="Analyste informatique dans un environnement technologique"
              style="width:100%;border-radius:12px;">
@@ -322,19 +338,27 @@
     function v(id){ return g(id).value.trim(); }
     function escapeHTML(str){ if(!str) return ''; return str.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 
-    // Navigation
-    function toggleMenu(){ const m=g('menu'); m.style.display=(m.style.display==='block')?'none':'block'; }
+    // Menu latéral
+    function toggleMenu(){
+      const m=g('menu'), ov=g('menu-overlay');
+      const isOpen=m.classList.contains('open');
+      if(isOpen){ m.classList.remove('open'); ov.classList.remove('show'); }
+      else { m.classList.add('open'); ov.classList.add('show'); }
+    }
+    function closeMenu(){ g('menu').classList.remove('open'); g('menu-overlay').classList.remove('show'); }
+
+    // Menu
     function go(id){
       document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
       g(id).classList.remove('hidden');
       g('top-right').style.display=(id==='home')?'flex':'none';
-      g('menu').style.display='none';
+      closeMenu();
       if(id==='dashboard') renderDashboard();
       if(id==='admin-panel'){ renderAdmin(); renderInboxAdmin(); }
       if(id==='class-page') renderClass();
     }
 
-    // Inscription flow
+    // Inscription
     function nextStep(step){
       if(step===1){
         const last=v('r_last'), first=v('r_first'), email=v('r_email');
@@ -502,7 +526,7 @@
       return 'lien';
     }
 
-    // Rendus Admin: cours/exercices
+    // Rendus Admin
     function renderAdminCourses(){
       const courses=load('courses'); const groups={DEB:[],MOY:[],AVA:[]}; courses.forEach(c=>groups[c.cls]?.push(c));
       g('admin-course-list').innerHTML = ['DEB','MOY','AVA'].map(k=>{
