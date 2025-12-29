@@ -7,9 +7,7 @@
   <style>
     :root{--primary:#1453ff;--bg:#f7fafc;--text:#111827;--muted:#6b7280;--card:#eef2ff;}
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
-
-    header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between}
+    body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)} header{background:var(--primary);color:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between}
     .menu-btn{display:flex;align-items:center;gap:10px;cursor:pointer}
     .menu-lines{display:flex;flex-direction:column;gap:4px}
     .menu-lines div{width:26px;height:3px;background:#fff;border-radius:2px}
@@ -411,4 +409,299 @@
     function setClassTab(tab){ activeClassTab=tab; updateClassTabs(); }
     function updateClassTabs(){
       ['tab-cours','tab-exos','tab-inbox'].forEach(id=>g(id).classList.remove('active'));
-      g('tab-'+(activeClassTab==='ex
+      g('tab-'+(activeClassTab==='exos'?'exos':activeClassTab)).classList.add('active');
+      g('class-courses').classList.add('hidden'); g('class-exercises').classList.add('hidden'); g('class-inbox').classList.add('hidden');
+      if(activeClassTab==='cours') g('class-courses').classList.remove('hidden');
+      else if(activeClassTab==='exos') g('class-exercises').classList.remove('hidden');
+      else g('class-inbox').classList.remove('hidden');
+    }
+    function renderClass(){
+      const user=load('current_user',null); if(!user) return;
+      const cls=user.cls;
+      const courses=load('courses').filter(c=>c.cls===cls);
+      const exos=load('exercises').filter(e=>e.cls===cls);
+      g('class-courses').innerHTML = courses.length? courses.map(fileItemHTML).join('') : '<p class="muted">Aucun cours pour le moment.</p>';
+      g('class-exercises').innerHTML = exos.length? exos.map(fileItemHTML).join('') : '<p class="muted">Aucun exercice pour le moment.</p>';
+      renderStudentInbox();
+    }
+    function fileItemHTML(item){
+      const name=item.title||'Fichier';
+      const link=item.link||'#';
+      const type=item.type||'';
+      return `<div class="file-item"><a href="${link}" target="_blank" rel="noopener">${escapeHTML(name)}</a><span class="muted">${escapeHTML(type)}</span></div>`;
+    }
+
+    // Messagerie étudiante
+    function getConversations(){ return load('conversations'); } // [{email,name,cls,thread:[{from,text,time}]}]
+    function saveConversations(list){ save('conversations',list); }
+    function renderStudentInbox(){
+      const user=load('current_user',null); if(!user) return;
+      const convs=getConversations(); const conv=convs.find(c=>c.email===user.email);
+      const box=g('student-inbox');
+      if(!conv || conv.thread.length===0){ box.innerHTML='<p class="muted">Aucune conversation pour le moment.</p>'; return; }
+      box.innerHTML = conv.thread.map(m=>{
+        const whoClass = m.from==='student'?'student':'admin';
+        return `<div class="msg ${whoClass}">${escapeHTML(m.text)}</div>`;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+    function sendQuestion(){
+      const user=load('current_user',null); if(!user){ alert('Veuillez vous connecter.'); return; }
+      const text=v('student-question'); if(!text){ alert('Veuillez écrire une question.'); return; }
+      let list=getConversations(); let conv=list.find(c=>c.email===user.email);
+      if(!conv){ conv={email:user.email,name:user.name,cls:user.cls,thread:[]}; list.push(conv); }
+      conv.thread.push({from:'student',text,time:Date.now()}); saveConversations(list);
+      g('student-question').value=''; renderStudentInbox(); alert('Question envoyée.');
+    }
+
+    // Admin
+    function checkAdmin(){
+      const code=v('admin-code');
+      if(code==='gsm'){ g('admin-error').classList.add('hidden'); go('admin-panel'); showAdminSection('courses'); }
+      else { g('admin-error').classList.remove('hidden'); }
+    }
+    function showAdminSection(sec){
+      ['courses','exercises','users','inbox'].forEach(s=>{
+        const secEl=g('sec-'+s); if(secEl) secEl.classList.add('hidden');
+        const btnEl=g('btn-sec-'+s); if(btnEl) btnEl.classList.remove('active');
+      });
+      g('sec-'+sec).classList.remove('hidden'); g('btn-sec-'+sec).classList.add('active');
+      if(sec==='courses') renderAdminCourses();
+      if(sec==='exercises') renderAdminExercises();
+      if(sec==='users') renderAdminUsers();
+      if(sec==='inbox') renderInboxAdmin();
+    }
+
+    // Ajout cours/exercices (lien ou fichier)
+    async function addCourse(){
+      const title=v('course-title'), cls=g('course-class').value;
+      const link=v('course-link'), file=g('course-file').files[0];
+      if(!title){ alert('Titre requis'); return; }
+      let storedLink='', type='';
+      if(file){ const data=await fileToBase64(file); storedLink=data; type=file.type||'fichier'; }
+      else if(link){ storedLink=link; type=guessTypeFromLink(link); }
+      else{ alert('Fournissez un lien ou téléversez un fichier.'); return; }
+      const courses=load('courses'); courses.push({title,cls,link:storedLink,type}); save('courses',courses);
+      clearCourseForm(); renderAdminCourses(); alert('Cours ajouté.');
+    }
+    function clearCourseForm(){ g('course-title').value=''; g('course-link').value=''; g('course-file').value=''; g('course-class').value='DEB'; }
+    async function addExercise(){
+      const title=v('exercise-title'), cls=g('exercise-class').value;
+      const link=v('exercise-link'), file=g('exercise-file').files[0];
+      if(!title){ alert('Titre requis'); return; }
+      let storedLink='', type='';
+      if(file){ const data=await fileToBase64(file); storedLink=data; type=file.type||'fichier'; }
+      else if(link){ storedLink=link; type=guessTypeFromLink(link); }
+      else{ alert('Fournissez un lien ou téléversez un fichier.'); return; }
+      const exos=load('exercises'); exos.push({title,cls,link:storedLink,type}); save('exercises',exos);
+      clearExerciseForm(); renderAdminExercises(); alert('Exercice ajouté.');
+    }
+    function clearExerciseForm(){ g('exercise-title').value=''; g('exercise-link').value=''; g('exercise-file').value=''; g('exercise-class').value='DEB'; }
+
+    function fileToBase64(file){
+      return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    function guessTypeFromLink(link){
+      const l=link.toLowerCase();
+      if(l.endsWith('.pdf')) return 'application/pdf';
+      if(l.endsWith('.doc')||l.endsWith('.docx')) return 'application/msword';
+      if(l.endsWith('.xls')||l.endsWith('.xlsx')||l.endsWith('.csv')) return 'application/vnd.ms-excel';
+      if(l.endsWith('.ppt')||l.endsWith('.pptx')) return 'application/vnd.ms-powerpoint';
+      if(l.endsWith('.png')) return 'image/png';
+      if(l.endsWith('.jpg')||l.endsWith('.jpeg')) return 'image/jpeg';
+      if(l.endsWith('.webp')) return 'image/webp';
+      if(l.endsWith('.mp4')) return 'video/mp4';
+      if(l.endsWith('.mov')) return 'video/quicktime';
+      if(l.endsWith('.avi')) return 'video/x-msvideo';
+      if(l.endsWith('.mkv')) return 'video/x-matroska';
+      return 'lien';
+    }
+
+    // Rendus Admin
+    function renderAdminCourses(){
+      const courses=load('courses'); const groups={DEB:[],MOY:[],AVA:[]}; courses.forEach(c=>groups[c.cls]?.push(c));
+      g('admin-course-list').innerHTML = ['DEB','MOY','AVA'].map(k=>{
+        const lbl=k==='DEB'?'Débutant':(k==='MOY'?'Moyen':'Avancé');
+        const items = groups[k].length? groups[k].map(fileItemHTML).join('') : '<p class="muted">—</p>';
+        return `<div class="card"><strong>${lbl}</strong>${items}</div>`;
+      }).join('');
+    }
+    function renderAdminExercises(){
+      const exos=load('exercises'); const groups={DEB:[],MOY:[],AVA:[]}; exos.forEach(e=>groups[e.cls]?.push(e));
+      g('admin-exercise-list').innerHTML = ['DEB','MOY','AVA'].map(k=>{
+        const lbl=k==='DEB'?'Débutant':(k==='MOY'?'Moyen':'Avancé');
+        const items = groups[k].length? groups[k].map(fileItemHTML).join('') : '<p class="muted">—</p>';
+        return `<div class="card"><strong>${lbl}</strong>${items}</div>`;
+      }).join('');
+    }
+
+    // Admin: inscrits
+    function renderAdminUsers(){ renderUsersList('ALL'); }
+    function filterUsers(cls){ renderUsersList(cls); }
+    function renderUsersList(filter){
+      const students=load('students'); const ul=g('users-list'); ul.innerHTML='';
+      const filtered=students.filter(s=>filter==='ALL'?true:s.cls===filter);
+      if(filtered.length===0){ ul.innerHTML='<li class="muted">Aucun inscrit.</li>'; return; }
+      filtered.forEach((s,idx)=>{
+        const clsLabel=s.cls==='DEB'?'Débutant':(s.cls==='MOY'?'Moyen':'Avancé');
+        const id=`details-${filter}-${idx}`;
+        const li=document.createElement('li');
+        li.innerHTML=`
+          <strong>${escapeHTML(s.name)||'(Sans nom)'}</strong> — ${clsLabel}
+          <button class="secondary" onclick="toggleDetails('${id}')">Détails</button>
+          <div id="${id}" class="details hidden">
+            <div><strong>Email:</strong> ${escapeHTML(s.email)||'—'}</div>
+            <div><strong>Téléphone:</strong> ${escapeHTML(s.phoneCode)||'—'} ${escapeHTML(s.phone)||''}</div>
+            <div><strong>Ville:</strong> ${escapeHTML(s.city)||'—'}</div>
+            <div><strong>Pays:</strong> ${escapeHTML(s.country)||'—'}</div>
+            <div><strong>Niveau d’étude:</strong> ${escapeHTML(s.study)||'—'}</div>
+            <div><strong>Profession:</strong> ${escapeHTML(s.job)||'—'}</div>
+            <div><strong>Niveau informatique:</strong> ${escapeHTML(s.it)||'—'}</div>
+            <div><strong>Code:</strong> ${escapeHTML(s.code)||'—'}</div>
+            <div><strong>Classe:</strong> ${clsLabel}</div>
+          </div>`;
+        ul.appendChild(li);
+      });
+    }
+    function toggleDetails(id){ const el=g(id); el.classList.toggle('hidden'); }
+
+    // Admin: Inbox regroupée par classe
+    let inboxClassFilter='ALL';
+    let inboxSelectedEmail=null;
+    function setInboxClass(cls){ inboxClassFilter=cls; inboxSelectedEmail=null; renderInboxAdmin(); }
+    function renderInboxAdmin(){
+      const conversations=getConversations();
+      const filtered=conversations.filter(c=>inboxClassFilter==='ALL'?true:c.cls===inboxClassFilter);
+      const list=g('inbox-user-list'); list.innerHTML='';
+      if(filtered.length===0){ list.innerHTML='<div class="muted">Aucune conversation.</div>'; g('inbox-thread').innerHTML=''; return; }
+      filtered.forEach(conv=>{
+        const initials=(conv.name||'?').charAt(0).toUpperCase();
+        const item=document.createElement('div');
+        item.className='inbox-user';
+        item.innerHTML=`<div class="avatar">${initials}</div>
+                        <div><div><strong>${escapeHTML(conv.name)}</strong></div><div class="muted">${conv.cls}</div></div>`;
+        item.onclick=()=>{ inboxSelectedEmail=conv.email; openAdminConversation(conv.email); };
+        list.appendChild(item);
+      });
+      if(!inboxSelectedEmail && filtered[0]){ inboxSelectedEmail=filtered[0].email; openAdminConversation(inboxSelectedEmail); }
+    }
+    function openAdminConversation(email){
+      const conversations=getConversations(); const conv=conversations.find(c=>c.email===email);
+      if(!conv){ g('inbox-thread').innerHTML='<div class="muted">Aucune conversation.</div>'; return; }
+      g('inbox-thread').innerHTML = conv.thread.map(m=>{
+        const who = m.from==='admin' ? 'admin' : 'student';
+        return `<div class="msg ${who}">${escapeHTML(m.text)}</div>`;
+      }).join('');
+      g('inbox-thread').scrollTop = g('inbox-thread').scrollHeight;
+    }
+    function sendAdminReply(){
+      if(!inboxSelectedEmail){ alert('Sélectionnez une conversation.'); return; }
+      const text=v('inbox-reply'); if(!text){ alert('Écrivez une réponse.'); return; }
+      const conversations=getConversations(); const conv=conversations.find(c=>c.email===inboxSelectedEmail);
+      if(!conv){ alert('Conversation introuvable.'); return; }
+      conv.thread.push({from:'admin',text,time:Date.now()}); saveConversations(conversations);
+      g('inbox-reply').value=''; openAdminConversation(inboxSelectedEmail);
+    }
+
+    // Dashboard
+    function renderDashboard(){
+      const courses=load('courses'); const groups={DEB:[],MOY:[],AVA:[]}; courses.forEach(c=>groups[c.cls]?.push(c.title));
+      g('dashboard-courses').innerHTML = `
+        <div class="card"><strong>Débutant:</strong> ${groups.DEB.join(', ')||'—'}</div>
+        <div class="card"><strong>Moyen:</strong> ${groups.MOY.join(', ')||'—'}</div>
+        <div class="card"><strong>Avancé:</strong> ${groups.AVA.join(', ')||'—'}</div>`;
+    }
+
+    // Init storage
+    if(!localStorage.getItem('courses')) save('courses',[]);
+    if(!localStorage.getItem('exercises')) save('exercises',[]);
+    if(!localStorage.getItem('students')) save('students',[]);
+    if(!localStorage.getItem('conversations')) save('conversations',[]);
+    go('home'); document.addEventListener("DOMContentLoaded", function() {
+    const homeSection = document.getElementById("home");
+    if (homeSection) {
+      // Cherche l'image dans la section Accueil
+      const img = homeSection.querySelector("img");
+      if (img) {
+        // Crée un nouvel élément <p> avec ton texte
+        const message = document.createElement("p");
+        message.textContent = "Bienvenue à la formation en informatique!";
+        message.style.fontSize = "1.2em";
+        message.style.fontWeight = "bold";
+        message.style.color = "#1453ff";
+
+        // Remplace l'image par le texte
+        img.replaceWith(message);
+        console.log("Image remplacée par le message.");
+      }
+    }
+  });
+  </script>
+  <style>
+  /* Mettre pays, indicatif et numéro sur la même ligne */
+  .phone-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  #r_country {
+    flex: 2;
+  }
+  #r_phone_code {
+    width: 80px;
+    text-align: center;
+  }
+  #r_phone {
+    flex: 3;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const countrySelect = document.getElementById("r_country");
+    const phoneCode = document.getElementById("r_phone_code");
+    const phoneNumber = document.getElementById("r_phone");
+
+    // Table des indicatifs et longueurs minimales
+    const phoneRules = {
+      "TG": { code: "+228", minLength: 8 },   // Togo
+      "FR": { code: "+33",  minLength: 10 },  // France
+      "US": { code: "+1",   minLength: 10 },  // États-Unis
+      "GH": { code: "+233", minLength: 9 },   // Ghana
+      "NG": { code: "+234", minLength: 10 }   // Nigeria
+      // 👉 tu peux ajouter d’autres pays ici
+    };
+    
+    // Met à jour l’indicatif et la règle selon le pays choisi
+    function updatePhoneRule() {
+      const selected = countrySelect.value;
+      if (phoneRules[selected]) {
+        phoneCode.value = phoneRules[selected].code;
+        phoneNumber.setAttribute("data-minlength", phoneRules[selected].minLength);
+      }
+    }
+    
+    // Vérifie la validité du numéro
+    phoneNumber.addEventListener("input", function() {
+      phoneNumber.value = phoneNumber.value.replace(/\D/g, ""); // garde seulement les chiffres
+      const minLength = parseInt(phoneNumber.getAttribute("data-minlength")) || 8;
+      if (phoneNumber.value.length < minLength) {
+        phoneNumber.setCustomValidity("Le numéro doit contenir au moins " + minLength + " chiffres.");
+      } else {
+        phoneNumber.setCustomValidity("");
+      }
+    });
+
+    // Initialisation
+    updatePhoneRule();
+    countrySelect.addEventListener("change", updatePhoneRule);
+  });
+</script>     
+</body>
+</html>
