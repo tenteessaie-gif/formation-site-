@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Informatique avec JUSWELL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />    
   <style>
     :root{--primary:#1453ff;--bg:#f7fafc;--text:#111827;--muted:#6b7280;--card:#eef2ff;}
     *{box-sizing:border-box}
@@ -98,11 +98,15 @@
     <!-- Accueil avec ton image paysage -->
     <section id="home" class="page">
       <h1>Informatique avec JUSWELL</h1>
-      <div class="card">
-        <img src="telechargement__22_.jpeg"
-             alt="Analyste informatique dans un environnement technologique"
+       <h1>Soyez les bienvenue sur cette plateforme !</h1>
+       <h2>Ici votre maîtrise, notre priorité</h2>
+      
+    <div class="card">
+           <div class="card">
+        <img src="image.jpg""
              style="width:100%;border-radius:12px;">
       </div>
+      <h2>Inscrivez-vous puis connectez à votre classe</h2>
       <div class="card"><h3>Débutant</h3><p class="muted">Utilisation de base, bureautique, internet.</p><button onclick="openClass('DEB')">Voir la classe</button></div>
       <div class="card"><h3>Moyen</h3><p class="muted">Excel avancé, programmation, réseaux.</p><button onclick="openClass('MOY')">Voir la classe</button></div>
       <div class="card"><h3>Avancé</h3><p class="muted">Développement web, bases de données, sécurité.</p><button onclick="openClass('AVA')">Voir la classe</button></div>
@@ -634,10 +638,6 @@
         message.style.fontSize = "1.2em";
         message.style.fontWeight = "bold";
         message.style.color = "#1453ff";
-
-        // Remplace l'image par le texte
-        img.replaceWith(message);
-        console.log("Image remplacée par le message.");
       }
     }
   });
