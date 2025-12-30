@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 // Connexion à ta base MySQL
 $servername = "sql101.infinityfree.com";
 $username   = "if0_40789341";
-$password   = "TON_MOT_DE_PASSE_MYSQL"; // remplace ici
+$password   = "Tenteessaie1"; // remplace ici
 $dbname     = "if0_40789341_etudiants";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
