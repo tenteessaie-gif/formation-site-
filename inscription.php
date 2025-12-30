@@ -2,7 +2,6 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Connexion à ta base MySQL
 $servername = "sql101.infinityfree.com";
 $username   = "if0_40789341";
 $password   = "Tenteessaie1"; // remplace ici
@@ -14,19 +13,14 @@ if ($conn->connect_error) {
 }
 echo "✅ Connexion réussie.<br>";
 
-// Vérifier les données reçues
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    echo "<h3>Données reçues :</h3>";
-    echo "Nom : " . $_POST['nom'] . "<br>";
-    echo "Email : " . $_POST['email'] . "<br>";
-    echo "Classe : " . $_POST['classe'] . "<br>";
-    echo "Code : " . $_POST['code'] . "<br>";
+    $nom    = $_POST['nom'] ?? '';
+    $email  = $_POST['email'] ?? '';
+    $classe = $_POST['classe'] ?? '';
+    $code   = $_POST['code'] ?? '';
 
-    // Préparer l'insertion
-    $nom    = $_POST['nom'];
-    $email  = $_POST['email'];
-    $classe = $_POST['classe'];
-    $code   = $_POST['code'];
+    echo "<h3>Données reçues :</h3>";
+    echo "Nom : $nom<br>Email : $email<br>Classe : $classe<br>Code : $code<br>";
 
     $stmt = $conn->prepare("INSERT INTO etudiants (nom, email, classe, code) VALUES (?, ?, ?, ?)");
     if (!$stmt) {
