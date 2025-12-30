@@ -1,34 +1,31 @@
 <?php
-// ⚠️ Remplace ces valeurs par celles de ta base MySQL sur free.nf
-$servername = "sqlXXX.free.nf";   // ton serveur MySQL (ex: sql213.free.nf)
-$username   = "ton_user";         // ton identifiant MySQL
-$password   = "ton_password";     // ton mot de passe MySQL
-$dbname     = "ton_database";     // le nom de ta base
+// Connexion à ta base MySQL sur InfinityFree
+$servername = "sql101.infinityfree.com";
+$username   = "if0_40789341"; // ton identifiant MySQL
+$password   = "TON_MOT_DE_PASSE_MYSQL"; // remplace par ton mot de passe
+$dbname     = "if0_40789341_etudiants"; // nom exact de ta base
 
-// Connexion à la base
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("❌ Connexion échouée : " . $conn->connect_error);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer toutes les infos envoyées par le formulaire
-    $nomEleve   = htmlspecialchars($_POST['nom']);
-    $emailEleve = htmlspecialchars($_POST['email']);
-    $classe     = htmlspecialchars($_POST['classe']);
-    $code       = htmlspecialchars($_POST['code']);
+    // Récupérer les données du formulaire
+    $nom       = htmlspecialchars($_POST['nom']);
+    $email     = htmlspecialchars($_POST['email']);
+    $classe    = htmlspecialchars($_POST['classe']);
+    $code      = htmlspecialchars($_POST['code']);
+    $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : "";
+    $adresse   = isset($_POST['adresse']) ? htmlspecialchars($_POST['adresse']) : "";
 
-    // ⚠️ Si tu as d’autres champs (téléphone, adresse, etc.), ajoute-les ici :
-    $telephone  = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : "";
-    $adresse    = isset($_POST['adresse']) ? htmlspecialchars($_POST['adresse']) : "";
-
-    // Enregistrer dans la base MySQL
+    // Enregistrement dans la base
     $stmt = $conn->prepare("INSERT INTO etudiants (nom, email, classe, code, telephone, adresse) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $nomEleve, $emailEleve, $classe, $code, $telephone, $adresse);
+    $stmt->bind_param("ssssss", $nom, $email, $classe, $code, $telephone, $adresse);
     $stmt->execute();
     $stmt->close();
 
-    echo "✅ Inscription réussie. Les informations de l’étudiant ont été enregistrées.";
+    echo "✅ Inscription réussie. Les informations ont été enregistrées.";
 }
 
 $conn->close();
