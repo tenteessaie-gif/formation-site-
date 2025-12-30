@@ -169,6 +169,67 @@
   <input type="hidden" name="email" id="hidden-email">
   <input type="hidden" name="code" id="hidden-code">
 </form>
+        <script>
+// Récupère le nom saisi (remplace "r-nom" par l'id réel de ton champ Nom)
+function getNom() {
+  return document.getElementById("r-nom").value.trim();
+}
+
+// Récupère l'email saisi (remplace "r-email" par l'id réel de ton champ Email)
+function getEmail() {
+  return document.getElementById("r-email").value.trim();
+}
+
+// Récupère la classe choisie (remplace "r-classe" par l'id réel de ton champ Classe)
+function getSelectedClasse() {
+  const el = document.getElementById("r-classe");
+  return el ? el.value : "D"; // Valeur par défaut si rien n'est choisi
+}
+
+// Génère le code selon la classe (ex: D-123456)
+function generateCodeFor(classe) {
+  const prefix = ["D","M","A"].includes(classe) ? classe : "D";
+  const num = Math.floor(100000 + Math.random() * 900000);
+  return `${prefix}-${num}`;
+}
+
+// Fonction appelée quand l'élève clique sur "Terminer"
+function finishRegister() {
+  // Vérifier la confirmation de paiement
+  if (!document.getElementById("r-confirm").checked) {
+    alert("Veuillez confirmer le paiement avant de terminer.");
+    return;
+  }
+
+  // Récupérer les infos
+  const nom = getNom();
+  const email = getEmail();
+  const classe = getSelectedClasse();
+
+  if (!nom || !email) {
+    alert("Veuillez remplir votre nom et votre email.");
+    return;
+  }
+
+  // Générer le code
+  const code = generateCodeFor(classe);
+
+  // Remplir le formulaire invisible
+  document.getElementById("hidden-nom").value = nom;
+  document.getElementById("hidden-email").value = email;
+  document.getElementById("hidden-classe").value = classe;
+  document.getElementById("hidden-code").value = code;
+
+  // Soumettre le formulaire invisible vers inscription.php
+  document.getElementById("send-code-form").submit();
+
+  // Feedback immédiat
+  alert("Inscription terminée ! Votre code est : " + code);
+
+  // Rediriger vers la page d'accueil ou confirmation
+  showHome();
+}
+</script>
       </div>
     </section>
 
