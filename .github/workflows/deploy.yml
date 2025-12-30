@@ -1,0 +1,21 @@
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - main   # change en "master" si ta branche principale s'appelle master
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.0
+        with:
+          server: ftpupload.net
+          username: epiz_30925341   # ton identifiant FTP (vu dans le panneau InfinityFree)
+          password: ${{ secrets.FTP_PASSWORD }}  # ton mot de passe stocké en secret GitHub
+          server-dir: /htdocs/      # dossier racine de ton site sur InfinityFree
