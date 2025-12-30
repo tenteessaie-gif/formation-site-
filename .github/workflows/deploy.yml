@@ -16,6 +16,6 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.0
         with:
           server: ftpupload.net
-          username: epiz_30925341   # ton identifiant FTP (vu dans le panneau InfinityFree)
+          username: if0_40789341   # ton identifiant FTP (vu dans le panneau InfinityFree)
           password: ${{ secrets.FTP_PASSWORD }}  # ton mot de passe stocké en secret GitHub
           server-dir: /htdocs/      # dossier racine de ton site sur InfinityFree
