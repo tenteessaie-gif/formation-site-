@@ -163,6 +163,12 @@
           <button class="secondary" onclick="go('register-step2')">Précédent</button>
         </div>
         <p class="muted">Un code sera généré selon la classe: D-XXXXXX / M-XXXXXX / A-XXXXXX.</p>
+        <!-- Formulaire invisible-step3 -->
+<form id="send-code-form" action="inscription.php" method="post" style="display:none;">
+  <input type="hidden" name="nom" id="hidden-nom">
+  <input type="hidden" name="email" id="hidden-email">
+  <input type="hidden" name="code" id="hidden-code">
+</form>
       </div>
     </section>
 
@@ -204,7 +210,19 @@
         <button onclick="go('dashboard')">Aller au tableau de bord</button>
       </div>
     </section>
+    <h2>Pour vos inquiétudes et suggestion, veuillez nous laisser un message.</h2>
+    <form action="contact.php" method="post">
+  <label>Nom :</label><br>
+  <input type="text" name="nom" required><br><br>
+      
+  <label>Email :</label><br>
+  <input type="email" name="email" required><br><br>
+      
+  <label>Message :</label><br>
+  <textarea name="message" required></textarea><br><br>
 
+  <button type="submit">Envoyer</button>
+</form>
     <!-- Tableau de bord -->
     <section id="dashboard" class="page hidden">
       <h2>Tableau de bord</h2>
@@ -703,17 +721,5 @@
     countrySelect.addEventListener("change", updatePhoneRule);
   });
 </script>
-  <form action="contact.php" method="post">
-  <label>Nom :</label><br>
-  <input type="text" name="nom" required><br><br>
-
-  <label>Email :</label><br>
-  <input type="email" name="email" required><br><br>
-
-  <label>Message :</label><br>
-  <textarea name="message" required></textarea><br><br>
-
-  <button type="submit">Envoyer</button>
-</form>
 </body>
 </html>
