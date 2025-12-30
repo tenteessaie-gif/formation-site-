@@ -1,9 +1,8 @@
 <?php
-// Connexion à ta base MySQL sur InfinityFree
 $servername = "sql101.infinityfree.com";
-$username   = "if0_40789341"; // ton identifiant MySQL
+$username   = "if0_40789341";
 $password   = "TON_MOT_DE_PASSE_MYSQL"; // remplace par ton mot de passe
-$dbname     = "if0_40789341_etudiants"; // nom exact de ta base
+$dbname     = "if0_40789341_etudiants";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -11,21 +10,17 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer les données du formulaire
-    $nom       = htmlspecialchars($_POST['nom']);
-    $email     = htmlspecialchars($_POST['email']);
-    $classe    = htmlspecialchars($_POST['classe']);
-    $code      = htmlspecialchars($_POST['code']);
-    $telephone = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : "";
-    $adresse   = isset($_POST['adresse']) ? htmlspecialchars($_POST['adresse']) : "";
+    $nom       = $_POST['nom'];
+    $email     = $_POST['email'];
+    $classe    = $_POST['classe'];
+    $code      = $_POST['code'];
 
-    // Enregistrement dans la base
-    $stmt = $conn->prepare("INSERT INTO etudiants (nom, email, classe, code, telephone, adresse) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $nom, $email, $classe, $code, $telephone, $adresse);
+    $stmt = $conn->prepare("INSERT INTO etudiants (nom, email, classe, code) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nom, $email, $classe, $code);
     $stmt->execute();
     $stmt->close();
 
-    echo "✅ Inscription réussie. Les informations ont été enregistrées.";
+    echo "✅ Inscription réussie.";
 }
 
 $conn->close();
