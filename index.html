@@ -702,6 +702,18 @@
     updatePhoneRule();
     countrySelect.addEventListener("change", updatePhoneRule);
   });
-</script>     
+</script>
+  <form action="contact.php" method="post">
+  <label>Nom :</label><br>
+  <input type="text" name="nom" required><br><br>
+
+  <label>Email :</label><br>
+  <input type="email" name="email" required><br><br>
+
+  <label>Message :</label><br>
+  <textarea name="message" required></textarea><br><br>
+
+  <button type="submit">Envoyer</button>
+</form>
 </body>
 </html>
