@@ -1,42 +1,35 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// ⚠️ Remplace ces valeurs par celles de ta base MySQL sur free.nf
+$servername = "sqlXXX.free.nf";   // ton serveur MySQL (ex: sql213.free.nf)
+$username   = "ton_user";         // ton identifiant MySQL
+$password   = "ton_password";     // ton mot de passe MySQL
+$dbname     = "ton_database";     // le nom de ta base
 
-require 'phpmailer/Exception.php';
-require 'phpmailer/PHPMailer.php';
-require 'phpmailer/SMTP.php';
+// Connexion à la base
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("❌ Connexion échouée : " . $conn->connect_error);
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nomEleve = htmlspecialchars($_POST['nom']);
+    // Récupérer toutes les infos envoyées par le formulaire
+    $nomEleve   = htmlspecialchars($_POST['nom']);
     $emailEleve = htmlspecialchars($_POST['email']);
-    $classe = htmlspecialchars($_POST['classe']);
-    $codeIntegration = htmlspecialchars($_POST['code']);
+    $classe     = htmlspecialchars($_POST['classe']);
+    $code       = htmlspecialchars($_POST['code']);
 
-    $mail = new PHPMailer(true);
+    // ⚠️ Si tu as d’autres champs (téléphone, adresse, etc.), ajoute-les ici :
+    $telephone  = isset($_POST['telephone']) ? htmlspecialchars($_POST['telephone']) : "";
+    $adresse    = isset($_POST['adresse']) ? htmlspecialchars($_POST['adresse']) : "";
 
-    try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'tonemail@gmail.com'; // ton Gmail
-        $mail->Password   = 'TON_MOT_DE_PASSE_APPLICATION'; // mot de passe d'application
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
+    // Enregistrer dans la base MySQL
+    $stmt = $conn->prepare("INSERT INTO etudiants (nom, email, classe, code, telephone, adresse) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $nomEleve, $emailEleve, $classe, $code, $telephone, $adresse);
+    $stmt->execute();
+    $stmt->close();
 
-        $mail->setFrom('tonemail@gmail.com', 'Administration');
-        $mail->addAddress($emailEleve);
-
-        $mail->isHTML(true);
-        $mail->Subject = "Votre code d'intégration au cours";
-        $mail->Body    = "Bonjour $nomEleve,<br><br>
-        Merci pour votre inscription à la classe <b>$classe</b>.<br>
-        Voici votre code d'intégration : <b>$codeIntegration</b><br><br>
-        Conservez-le précieusement pour accéder à votre cours.";
-
-        $mail->send();
-        echo "✅ Votre code d'intégration a été envoyé à votre adresse email.";
-    } catch (Exception $e) {
-        echo "❌ Erreur lors de l'envoi : {$mail->ErrorInfo}";
-    }
+    echo "✅ Inscription réussie. Les informations de l’étudiant ont été enregistrées.";
 }
+
+$conn->close();
 ?>
