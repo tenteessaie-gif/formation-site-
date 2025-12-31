@@ -112,46 +112,57 @@
       <div class="card"><h3>Avancé</h3><p class="muted">Développement web, bases de données, sécurité.</p><button onclick="openClass('AVA')">Voir la classe</button></div>
     </section>
 
-    <!-- Inscription — Étape 1 -->
-    <section id="register-step1" class="page hidden">
-      <h2>Inscription — Étape 1</h2>
-      <div class="card">
-        <label>Nom</label><input id="r_last" placeholder="Ex: KOSSI">
-        <label>Prénom</label><input id="r_first" placeholder="Ex: Ama">
-        <label>Email</label><input id="r_email" type="email" placeholder="exemple@mail.com">
-        <label>Téléphone</label>
-        <div class="row">
-          <input id="r_phone_code" class="small-input" placeholder="+228">
-          <input id="r_phone" type="tel" placeholder="92239333">
-        </div>
-        <label>Ville</label><input id="r_city" placeholder="Ex: Kpalimé">
-        <label>Pays</label><input id="r_country" placeholder="Ex: TOGO">
-        <div class="row">
-          <button onclick="nextStep(1)">Suivant</button>
-          <button class="secondary" onclick="go('home')">Annuler</button>
-        </div>
-      </div>
-    </section>
+    <!-- Inscription – Étape 1 -->
+<section id="register-step1" class="page hidden">
+  <h2>Inscription – Étape 1</h2>
+  <div class="card">
+    <label>Nom</label><input id="r_last" name="nom" placeholder="Ex: KOSSI" required>
+    <label>Prénom</label><input id="r_first" name="prenom" placeholder="Ex: Ama" required>
+    <label>Email</label><input id="r_email" name="email" type="email" placeholder="exemple@mail.com" required>
+    <label>Téléphone</label>
+    <div class="row">
+      <input id="r_phone_code" class="small-input" placeholder="+228">
+      <input id="r_phone" name="telephone" type="tel" placeholder="92239333">
+    </div>
+    <label>Ville</label><input id="r_city" name="ville" placeholder="Ex: Kpalimé">
+    <label>Pays</label><input id="r_country" name="pays" placeholder="Ex: TOGO">
+    <div class="row">
+      <button type="button" onclick="saveStep1(); nextStep(1)">Suivant</button>
+      <button type="button" class="secondary" onclick="go('home')">Annuler</button>
+    </div>
+  </div>
+</section>
 
-    <!-- Inscription — Étape 2 -->
-    <section id="register-step2" class="page hidden">
-      <h2>Inscription — Étape 2</h2>
-      <div class="card">
-        <label>Niveau d’étude</label>
-        <select id="r_study">
-          <option>CEPD</option><option>BEPC</option><option>BAC1</option><option>BAC2</option><option>Licence</option>
-        </select>
-        <label>Profession</label><input id="r_job" placeholder="Ex: Étudiant, Enseignant, ...">
-        <label>Niveau informatique</label>
-        <select id="r_it"><option>Débutant</option><option>Moyen</option><option>Avancé</option></select>
-        <label>Niveau de formation (classe)</label>
-        <select id="r_training"><option value="DEB">Débutant</option><option value="MOY">Moyen</option><option value="AVA">Avancé</option></select>
-        <div class="row">
-          <button onclick="nextStep(2)">Suivant</button>
-          <button class="secondary" onclick="go('register-step1')">Précédent</button>
-        </div>
-      </div>
-    </section>
+   <!-- Inscription – Étape 2 -->
+<section id="register-step2" class="page hidden">
+  <h2>Inscription – Étape 2</h2>
+  <div class="card">
+    <label>Niveau d’étude</label>
+    <select id="r_study" name="niveau_formation">
+      <option>CEPD</option><option>BEPC</option><option>BAC1</option><option>BAC2</option><option>Licence</option>
+    </select>
+
+    <label>Profession</label>
+    <input id="r_job" name="profession" placeholder="Ex: Étudiant, Enseignant, ...">
+
+    <label>Niveau informatique</label>
+    <select id="r_it" name="niveau_informatique">
+      <option>Débutant</option><option>Moyen</option><option>Avancé</option>
+    </select>
+
+    <label>Niveau de formation (classe)</label>
+    <select id="r_training" name="classe">
+      <option value="Débutant">Débutant</option>
+      <option value="Moyen">Moyen</option>
+      <option value="Avancé">Avancé</option>
+    </select>
+
+    <div class="row">
+      <button type="button" onclick="saveStep2(); envoyerInscription()">Valider</button>
+      <button type="button" class="secondary" onclick="go('register-step1')">Précédent</button>
+    </div>
+  </div>
+</section>
 
     <!-- Inscription — Étape 3 -->
     <section id="register-step3" class="page hidden">
@@ -776,6 +787,41 @@ function finishRegister() {
     updatePhoneRule();
     countrySelect.addEventListener("change", updatePhoneRule);
   });
+</script>
+  <form id="final-form" action="https://tenteessaie.infinityfreeapp.com/inscription.php" method="post" style="display:none;">
+  <!-- Étape 1 -->
+  <input type="hidden" name="nom" id="f_nom">
+  <input type="hidden" name="prenom" id="f_prenom">
+  <input type="hidden" name="email" id="f_email">
+  <input type="hidden" name="telephone" id="f_telephone">
+  <input type="hidden" name="ville" id="f_ville">
+  <input type="hidden" name="pays" id="f_pays">
+  <!-- Étape 2 (tu les ajouteras ensuite) -->
+  <input type="hidden" name="classe" id="f_classe">
+  <input type="hidden" name="profession" id="f_profession">
+  <input type="hidden" name="niveau_informatique" id="f_niveau_info">
+  <input type="hidden" name="niveau_formation" id="f_niveau_formation">
+</form>
+ <script>
+function saveStep1() {
+  document.getElementById("f_nom").value        = document.getElementById("r_last").value.trim();
+  document.getElementById("f_prenom").value     = document.getElementById("r_first").value.trim();
+  document.getElementById("f_email").value      = document.getElementById("r_email").value.trim();
+  document.getElementById("f_telephone").value  = document.getElementById("r_phone").value.trim();
+  document.getElementById("f_ville").value      = document.getElementById("r_city").value.trim();
+  document.getElementById("f_pays").value       = document.getElementById("r_country").value.trim();
+}
+
+function saveStep2() {
+  document.getElementById("f_classe").value             = document.getElementById("r_training").value;
+  document.getElementById("f_profession").value         = document.getElementById("r_job").value.trim();
+  document.getElementById("f_niveau_info").value        = document.getElementById("r_it").value;
+  document.getElementById("f_niveau_formation").value   = document.getElementById("r_study").value;
+}
+
+function envoyerInscription() {
+  document.getElementById("final-form").submit();
+}
 </script>
 </body>
 </html>
