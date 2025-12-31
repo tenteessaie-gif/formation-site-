@@ -46,7 +46,7 @@ $stmt->bind_param(
     $pays,
     $classe,
     $profession,
-    $niveau_info,
+    $niveau_informatique,
     $niveau_formation,
     $code
 );
