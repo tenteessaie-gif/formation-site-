@@ -28,9 +28,9 @@ $niveau_formation= $_POST['niveau_formation'] ?? '';
 $code            = $_POST['code'] ?? '';
 
 // Préparation de la requête
-$stmt = $conn->prepare("INSERT INTO etudiants
-    (nom, prenom, email, telephone, ville, pays, classe, profession, niveau_informatique, niveau_formation, code, paiement)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO etudiants 
+(nom, Prenom, email, telephone, Ville, Pays, classe, Profession, Niveau_informatique, Niveau_formation, code)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 if (!$stmt) {
     die("❌ Erreur préparation requête : " . $conn->error);
@@ -38,7 +38,7 @@ if (!$stmt) {
 
 // Associer les paramètres
 $stmt->bind_param(
-    "ssssssssssss",
+    "sssssssssss",
     $nom,
     $prenom,
     $email,
@@ -47,7 +47,7 @@ $stmt->bind_param(
     $pays,
     $classe,
     $profession,
-    $niveau_informatique,
+    $niveau_info,
     $niveau_formation,
     $code
 );
