@@ -28,7 +28,7 @@ $code              = $_POST['code'] ?? '';
 
 // Préparation de la requête
 $stmt = $conn->prepare("INSERT INTO etudiants 
-(nom, Prenom, email, telephone, Ville, Pays, classe, Profession, Niveau_informatique, Niveau_formation, code)
+(nom, Prenom, email, telephone, ville, pays, classe, profession, niveau_informatique, niveau_formation, code)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 if (!$stmt) {
