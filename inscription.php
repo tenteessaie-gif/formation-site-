@@ -48,12 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("sssssssssss", $nom, $prenom, $email, $telephone, $ville, $pays, $classe, $profession, $niveau_info, $niveau_formation, $code);
 
     if ($stmt->execute()) {
-        echo "✅ Inscription réussie.<br>Code attribué : <strong>$code</strong>";
-    } else {
-        echo "❌ Erreur : " . $stmt->error;
-    }
-
     $stmt->close();
+    // Redirection vers confirmation.php avec le code généré
+    header("Location: confirmation.php?code=" . urlencode($code));
+    exit();
+} else {
+    echo "❌ Erreur : " . $stmt->error;
 }
 
 $conn->close();
